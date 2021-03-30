@@ -31,7 +31,8 @@ public class Player : MonoBehaviour
         socketManager.AddOpenEvent((sender, e) =>
         {
             print("Established!");
-            StartCoroutine(SendPositionInfinitely());
+            established = true;
+            //StartCoroutine(SendPositionInfinitely());
         });
         
         socketManager.SocketConnect(true);
@@ -43,6 +44,7 @@ public class Player : MonoBehaviour
             }
         );
         socketManager.AddCloseEvent((sender, e) => { print("Connection Closed"); });
+        StartCoroutine(SendPositionInfinitely());
     }
 
     private void Update()
@@ -64,7 +66,7 @@ public class Player : MonoBehaviour
         Debug.Log("Start coroutine");
         while (true)
         {
-            SendPositionPacket();
+            if(established) SendPositionPacket();
             yield return new WaitForSeconds(.1f);
         }
 
