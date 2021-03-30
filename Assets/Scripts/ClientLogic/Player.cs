@@ -63,10 +63,12 @@ public class Player : MonoBehaviour
 
     private IEnumerator SendPositionInfinitely()
     {
+        while (!established) yield return null;
+
         Debug.Log("Start coroutine");
         while (true)
         {
-            if(established) SendPositionPacket();
+            SendPositionPacket();
             yield return new WaitForSeconds(.1f);
         }
 
