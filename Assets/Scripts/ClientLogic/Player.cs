@@ -14,7 +14,7 @@ public class Player : MonoBehaviour
     
     private long recieveTime, sendTime = 0;
     
-    void Start()
+    private void Start()
     {
         socketManager.SocketInit("ws://hojoondev.kro.kr:3001", true);
         
@@ -29,14 +29,35 @@ public class Player : MonoBehaviour
             }
         );
         socketManager.AddCloseEvent((sender, e) => { print("Connection Closed"); });
+
+        StartCoroutine(SendPositionInfinitely());
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if (!Input.GetKeyDown(KeyCode.Space)) return;
-        
+    }
+
+    private void SendPositionPacket()
+    {
         var pos = transform.position;
         socketManager.SocketSend($"{gameObject.name},{pos.x},{pos.y}", true, (error) => {sendTime = DateTime.Now.Ticks; });
+    }
+
+    private IEnumerator SendPositionInfinitely()
+    {
+        var time = 0f;
+        while (true)
+        {
+            if (time >= .1f)
+            {
+                SendPositionPacket();
+                time = 0f;
+            }
+            
+            time += Time.deltaTime;
+            yield return null;
+        }
     }
 }
