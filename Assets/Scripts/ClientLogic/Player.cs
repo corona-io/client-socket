@@ -33,7 +33,6 @@ public class Player : MonoBehaviour
         StartCoroutine(SendPositionInfinitely());
     }
 
-    // Update is called once per frame
     private void Update()
     {
         if (!Input.GetKeyDown(KeyCode.Space)) return;
@@ -47,17 +46,10 @@ public class Player : MonoBehaviour
 
     private IEnumerator SendPositionInfinitely()
     {
-        var time = 0f;
         while (true)
         {
-            if (time >= .1f)
-            {
-                SendPositionPacket();
-                time = 0f;
-            }
-            
-            time += Time.deltaTime;
-            yield return null;
+            SendPositionPacket();
+            yield return new WaitForSeconds(.1f);
         }
     }
 }
