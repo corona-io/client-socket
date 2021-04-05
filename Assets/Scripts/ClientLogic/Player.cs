@@ -59,10 +59,16 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void OnApplicationQuit()
+    {
+        socketManager.SocketSend($"{PacketNames.ohmygod:f},{nickname}");
+        socketManager.SocketClose();
+    }
+
     private void SendPositionPacket()
     {
         var pos = transform.position;
-        var packetString = $"{PacketNames.move:f},{gameObject.name},{pos.x},{pos.y}";
+        var packetString = $"{PacketNames.move:f},{nickname},{pos.x},{pos.y}";
         text.text = packetString;
         
         socketManager.SocketSend(packetString, true, (error) => { sendTime = DateTime.Now.Ticks; });
