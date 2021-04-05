@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum PacketNames
 {
@@ -20,8 +21,10 @@ public class Player : MonoBehaviour
     [SerializeField] private bool isMine;
     [SerializeField] private int healthPoint;
     [SerializeField] private float speed;
-    private bool established;
+    [SerializeField] private Text text;
+    [SerializeField] private string nickname;
     
+    private bool established;
     private long recieveTime, sendTime = 0;
     
     private void Start()
@@ -45,6 +48,7 @@ public class Player : MonoBehaviour
         );
         socketManager.AddCloseEvent((sender, e) => { print("Connection Closed"); });
         StartCoroutine(SendPositionInfinitely());
+        StartCoroutine(SendPlayerCreatePacket());
     }
 
     private void Update()
@@ -58,14 +62,30 @@ public class Player : MonoBehaviour
     private void SendPositionPacket()
     {
         var pos = transform.position;
-        socketManager.SocketSend($"{PacketNames.move:f},{gameObject.name},{pos.x},{pos.y}", true, (error) => {sendTime = DateTime.Now.Ticks; });
+        var packetString = $"{PacketNames.move:f},{gameObject.name},{pos.x},{pos.y}";
+        text.text = packetString;
+        
+        socketManager.SocketSend(packetString, true, (error) => { sendTime = DateTime.Now.Ticks; });
+    }
+
+    private IEnumerator SendPlayerCreatePacket()
+    {
+        while (!established) yield return null;
+
+        if (!isMine) yield break;
+        
+        var pos = transform.position;
+        var packetString = $"{PacketNames.create:f},h,{nickname},{pos.x},{pos.y}";
+        text.text = packetString;
+        
+        socketManager.SocketSend(packetString, true, (error) => { sendTime = DateTime.Now.Ticks; });
     }
 
     private IEnumerator SendPositionInfinitely()
     {
         while (!established) yield return null;
 
-        Debug.Log("Start coroutine");
+        Debug.Log("Start sending position coroutine");
         while (true)
         {
             SendPositionPacket();
