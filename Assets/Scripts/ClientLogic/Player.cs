@@ -11,7 +11,8 @@ public enum PacketNames
     attack,
     damage,
     ohmygod,
-    lv999boss
+    lv999boss,
+    None
 }
 
 public class Player : MonoBehaviour
@@ -43,12 +44,12 @@ public class Player : MonoBehaviour
             (sender, e) => 
             {
                 recieveTime = DateTime.Now.Ticks;
-                print($"It took {(recieveTime - sendTime) / 10000} milliseconds\n To recieve \"{e.Data}\"");
+                print($"It took {(recieveTime - sendTime) / 10000} milliseconds\n To recieve \"{SplitPacket(e.Data)}\"");
             }
         );
         socketManager.AddCloseEvent((sender, e) => { print("Connection Closed"); });
-        StartCoroutine(SendPositionInfinitely());
         StartCoroutine(SendPlayerCreatePacket());
+        StartCoroutine(SendPositionInfinitely());
     }
 
     private void Update()
@@ -97,8 +98,6 @@ public class Player : MonoBehaviour
             SendPositionPacket();
             yield return new WaitForSeconds(.1f);
         }
-
-        yield return null;
     }
 
     private void MoveWithInput()
@@ -108,4 +107,38 @@ public class Player : MonoBehaviour
 
         transform.Translate(new Vector3(horizon, vertical) * (speed * Time.deltaTime));
     }
+
+    private string[] SplitPacket(string packet)
+    {
+        if (packet.StartsWith("brodcast: "))
+        {
+            return packet.Substring(10).Split(',');
+        }
+
+        return new string[0];
+    }
+
+    private PacketNames MakePacketName(string packet)
+    {
+        return packet switch
+        {
+            "create" => PacketNames.create,
+            "move" => PacketNames.move,
+            "attack" => PacketNames.attack,
+            "damage" => PacketNames.damage,
+            "ohmygod" => PacketNames.ohmygod,
+            "lv999boss" => PacketNames.lv999boss,
+            _ => PacketNames.None
+        };
+    }
+
+    /*private void ExecuteActionByPacket(string[] packet)
+    {
+        if (packet.Length <= 0) return;
+
+        packet[0] switch
+        {
+            PacketNames.create:f => 
+        };
+    }*/
 }
