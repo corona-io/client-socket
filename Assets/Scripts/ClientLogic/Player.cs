@@ -118,7 +118,7 @@ public class Player : MonoBehaviour
         return new string[0];
     }
 
-    private PacketNames MakePacketName(string packet)
+    private PacketNames ConvertPacketToEnum(string packet)
     {
         return packet switch
         {
@@ -132,13 +132,22 @@ public class Player : MonoBehaviour
         };
     }
 
-    /*private void ExecuteActionByPacket(string[] packet)
+    private void ExecuteActionByPacket(string[] packet)
     {
         if (packet.Length <= 0) return;
 
-        packet[0] switch
+        /*
+        ConvertPacketToEnum(packet[0]) switch
         {
-            PacketNames.create:f => 
+            PacketNames.create => ,
+            PacketNames.move => ,
+            PacketNames.attack => ,
+            PacketNames.damage => ,
+            PacketNames.ohmygod => ,
+            PacketNames.lv999boss => ,
+            PacketNames.None => ,
+            _ => 
         };
-    }*/
+        */
+    }
 }
