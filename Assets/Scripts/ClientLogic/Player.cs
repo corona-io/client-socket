@@ -17,7 +17,7 @@ public enum PacketNames
 
 public class Player : MonoBehaviour
 {
-    private SocketManager socketManager = SocketManager.GetSingleton();
+    private readonly SocketManager socketManager = SocketManager.GetSingleton();
     
     [SerializeField] private bool isMine;
     [SerializeField] private int healthPoint;
@@ -30,7 +30,9 @@ public class Player : MonoBehaviour
     
     private void Start()
     {
-        socketManager.SocketInit("ws://hojoondev.kro.kr:3001", true);
+        if (!isMine) return;
+        
+        socketManager.SocketInit("ws://localhost:3001", true);
         
         socketManager.AddOpenEvent((sender, e) =>
         {
@@ -70,7 +72,7 @@ public class Player : MonoBehaviour
     {
         var pos = transform.position;
         var packetString = $"{PacketNames.move:f},{nickname},{pos.x},{pos.y}";
-        text.text = packetString;
+        text.text ??= packetString;
         
         socketManager.SocketSend(packetString, true, (error) => { sendTime = DateTime.Now.Ticks; });
     }
@@ -83,7 +85,7 @@ public class Player : MonoBehaviour
         
         var pos = transform.position;
         var packetString = $"{PacketNames.create:f},h,{nickname},{pos.x},{pos.y}";
-        text.text = packetString;
+        text.text ??= packetString;
         
         socketManager.SocketSend(packetString, true, (error) => { sendTime = DateTime.Now.Ticks; });
     }
