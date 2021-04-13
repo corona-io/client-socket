@@ -7,8 +7,9 @@ namespace ClientLogic.Singleton
 {
     public class UIManager : Singleton<UIManager>
     {
-        [Header("Make Player")]
-        public InputField nicknameInput;
+        [Header("Make Player")] public InputField nicknameInput;
+
+        [Header("In Playing")] public Text packetText;
 
         public void OnStartingInput()
         {
@@ -19,6 +20,11 @@ namespace ClientLogic.Singleton
         {
             Instantiate(Resources.Load("Prefabs/player"), Vector3.zero, Quaternion.identity).name = name;
             nicknameInput.gameObject.SetActive(false);
+        }
+
+        public void SetPacketMessage(string msg)
+        {
+            packetText.text = msg;
         }
     }
 }

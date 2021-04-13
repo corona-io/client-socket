@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using ClientLogic.Singleton;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,35 +19,36 @@ public enum PacketNames
 public class Player : MonoBehaviour
 {
     private readonly SocketManager socketManager = SocketManager.GetSingleton();
-    
+
     [SerializeField] private bool isMine;
     [SerializeField] private int healthPoint;
     [SerializeField] private float speed;
     [SerializeField] private Text text;
     [SerializeField] private string nickname;
-    
+
     private bool established;
     private long recieveTime, sendTime = 0;
-    
+
     private void Start()
     {
         if (!isMine) return;
-        
+
         socketManager.SocketInit("ws://localhost:3001", true);
-        
+
         socketManager.AddOpenEvent((sender, e) =>
         {
             print("Established!");
             established = true;
             //StartCoroutine(SendPositionInfinitely());
         });
-        
+
         socketManager.SocketConnect(true);
         socketManager.AddMessageEvent(
-            (sender, e) => 
+            (sender, e) =>
             {
                 recieveTime = DateTime.Now.Ticks;
-                print($"It took {(recieveTime - sendTime) / 10000} milliseconds\n To recieve \"{SplitPacket(e.Data)}\"");
+                print(
+                    $"It took {(recieveTime - sendTime) / 10000} milliseconds\n To recieve \"{SplitPacket(e.Data)}\"");
             }
         );
         socketManager.AddCloseEvent((sender, e) => { print("Connection Closed"); });
@@ -72,8 +74,8 @@ public class Player : MonoBehaviour
     {
         var pos = transform.position;
         var packetString = $"{PacketNames.move:f},{nickname},{pos.x},{pos.y}";
-        text.text ??= packetString;
-        
+        UIManager.Instance.SetPacketMessage(packetString);
+
         socketManager.SocketSend(packetString, true, (error) => { sendTime = DateTime.Now.Ticks; });
     }
 
@@ -82,11 +84,11 @@ public class Player : MonoBehaviour
         while (!established) yield return null;
 
         if (!isMine) yield break;
-        
+
         var pos = transform.position;
         var packetString = $"{PacketNames.create:f},h,{nickname},{pos.x},{pos.y}";
-        text.text ??= packetString;
-        
+        UIManager.Instance.SetPacketMessage(packetString);
+
         socketManager.SocketSend(packetString, true, (error) => { sendTime = DateTime.Now.Ticks; });
     }
 

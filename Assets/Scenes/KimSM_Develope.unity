@@ -595,6 +595,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 0
   nicknameInput: {fileID: 1073261417}
+  packetText: {fileID: 833575982}
 --- !u!1 &1073261415
 GameObject:
   m_ObjectHideFlags: 0
