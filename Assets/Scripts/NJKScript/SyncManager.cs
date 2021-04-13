@@ -46,20 +46,30 @@ public class SyncManager : MonoBehaviour
         
     }
 
-IEnumerator HandleCreateEvent(string[] tokens) 
+    void CreateEntity(string name, float x, float y) {
+        if (entityPool.ContainsKey(name)) return;
+        entityPool.Add(name, null);
+        GameObject go = Instantiate(
+                    playerPrefab,
+                    new Vector3(x, y, 0),
+                    new Quaternion(0, 0, 0, 0)
+                );
+        entityPool[name] = go;
+    }
+
+    IEnumerator HandleCreateEvent(string[] tokens) 
     {
-        if (tokens[1] == "h")
+        entityPool.TryGetValue(tokens[1], out GameObject obj);
+        if (obj is null)
         {
-            GameObject go = Instantiate(
-                                playerPrefab,
-                                new Vector3(int.Parse(tokens[3]), int.Parse(tokens[4]), 0),
-                                new Quaternion(0, 0, 0, 0)
-                            );
-            entityPool.Add(tokens[2], go);
-        }
-        else 
-        { 
-            // TODO: do something else
+            if (tokens[1] == "h")
+            {
+                CreateEntity(tokens[2], float.Parse(tokens[3]), float.Parse(tokens[4]));
+            }
+            else
+            {
+                // TODO: do something else
+            }
         }
 
         yield break; 
@@ -67,9 +77,14 @@ IEnumerator HandleCreateEvent(string[] tokens)
     IEnumerator HandleMoveEvent(string[] tokens) 
     {
         entityPool.TryGetValue(tokens[1], out GameObject obj);
-        if (!(obj is null)) 
+        if (obj is null)
         {
-            obj.transform.position = new Vector3(int.Parse(tokens[2]), int.Parse(tokens[3]), 0);
+            // moving an object that doesnt exist???
+            CreateEntity(tokens[1], float.Parse(tokens[2]), float.Parse(tokens[3]));
+        }
+        else 
+        {
+            obj.transform.position = new Vector3(float.Parse(tokens[2]), float.Parse(tokens[3]), 0);
             // TODO: implement dead reckoning
         }
 
@@ -79,9 +94,12 @@ IEnumerator HandleCreateEvent(string[] tokens)
     IEnumerator HandleDamageEvent(string[] tokens) { yield break; }
     IEnumerator HandleDeathEvent(string[] tokens) 
     {
-        entityPool.TryGetValue(tokens[1], out GameObject obj); 
-        if (!(obj is null)) Destroy(obj);
-        entityPool.Remove(tokens[1]);
+        entityPool.TryGetValue(tokens[1], out GameObject obj);
+        if (!(obj is null))
+        {
+            Destroy(obj);
+            entityPool.Remove(tokens[1]);
+        }
         yield break; 
     }
     IEnumerator HandleLVLUpEvent(string[] tokens) { yield break; }

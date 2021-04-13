@@ -65,7 +65,6 @@ public class ConnectionManager : MonoBehaviour
                 {
                     string[] splitTokens = {"brodcast: "};
                     var message = e.Data.Split(splitTokens, StringSplitOptions.RemoveEmptyEntries)[0];
-                    print($"Recieved: \"{message}\"");
                     messageQueue.Enqueue(message);
                 }
             );
