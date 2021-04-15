@@ -23,6 +23,7 @@ public class SyncManager : MonoBehaviour
     Dictionary<string, int> mutexPool;
     Dictionary<string, float> lastPacket;
     Dictionary<string, Vector3> lastPos;
+    Dictionary<string, Vector3> lastVelo;
 
     // Start is called before the first frame update
     void Start()
@@ -31,6 +32,7 @@ public class SyncManager : MonoBehaviour
         mutexPool = new Dictionary<string, int>();
         lastPacket = new Dictionary<string, float>();
         lastPos = new Dictionary<string, Vector3>();
+        lastVelo = new Dictionary<string, Vector3>();
     }
 
     // Update is called once per frame
@@ -65,7 +67,8 @@ public class SyncManager : MonoBehaviour
         entityPool[name] = go;
         mutexPool.Add(name, 0);
         lastPacket.Add(name, Time.time);
-        lastPos.Add(name, new Vector3(x,y,0));
+        lastPos.Add(name, new Vector3(x, y, 0));
+        lastVelo.Add(name, new Vector3(0, 0, 0));
     }
 
     IEnumerator HandleCreateEvent(string[] tokens) 
@@ -97,26 +100,38 @@ public class SyncManager : MonoBehaviour
         }
         else 
         {
+            
+            Vector3 newPos, velocity;
+            float lastMoveTime;
+
+            newPos = new Vector3(float.Parse(tokens[2]), float.Parse(tokens[3]), 0);
+            velocity = (newPos - lastPos[name]) / (Time.time - lastPacket[name]);
+            
+            // Sanitizing Inputs
+            if (velocity.sqrMagnitude > 10000f) velocity = lastVelo[name];
+            
+            lastMoveTime = lastPacket[name] = Time.time;        
+            lastPos[name] = newPos;
+
             mutexPool[name]++;
             while (mutexPool[name] > 1) yield return new WaitForEndOfFrame();
-            
-            Vector3 newPos = new Vector3(float.Parse(tokens[2]), float.Parse(tokens[3]), 0);
-            Vector3 velocity = (newPos - lastPos[name]) / (Time.time - lastPacket[name]);
-            float lastMovetime;
-            
-            print($"{velocity}");
-            obj.transform.position = lastPos[name] = newPos;
-            lastPacket[name] = lastMovetime = Time.time;
 
-            
-            while (mutexPool[name] < 2 && obj)
+
+
+            while (mutexPool[name] < 2)
             {
-                obj.transform.position += velocity * (Time.time - lastMovetime);
-                lastMovetime = Time.time;
+                obj.transform.position += 
+                    velocity * (Time.time - lastMoveTime)
+                +   0.5f * (velocity - lastVelo[name]) *
+                (Time.time - lastMoveTime) * (Time.time - lastMoveTime);
+
+                lastMoveTime = Time.time;
                 yield return new WaitForEndOfFrame();
-                // TODO: implement dead reckoning
             }
+            obj.transform.position = newPos;
+            lastVelo[name] = velocity;
             mutexPool[name]--;
+            
         }
 
         yield break;
@@ -135,6 +150,7 @@ public class SyncManager : MonoBehaviour
             mutexPool.Remove(name);
             lastPacket.Remove(name);
             lastPos.Remove(name);
+            lastVelo.Remove(name);
         }
         yield break; 
     }
