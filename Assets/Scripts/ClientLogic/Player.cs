@@ -17,36 +17,35 @@ public enum PacketNames
 public class Player : MonoBehaviour
 {
     private SocketManager socketManager = SocketManager.GetSingleton();
-    
+
     [SerializeField] private bool isMine;
     [SerializeField] private int healthPoint;
     [SerializeField] private float speed;
     [SerializeField] private Text text;
     [SerializeField] private string nickname;
     
-    private bool established;
     private long recieveTime, sendTime = 0;
     
     private void Start()
     {
-        socketManager.SocketInit("ws://hojoondev.kro.kr:3001", true);
+        //socketManager.SocketInit("ws://hojoondev.kro.kr:3001", true);
         
-        socketManager.AddOpenEvent((sender, e) =>
-        {
-            print("Established!");
-            established = true;
+        //socketManager.AddOpenEvent((sender, e) =>
+        //{
+        //    print("Established!");
+        //    established = true;
             //StartCoroutine(SendPositionInfinitely());
-        });
+        //});
         
-        socketManager.SocketConnect(true);
-        socketManager.AddMessageEvent(
-            (sender, e) => 
-            {
-                recieveTime = DateTime.Now.Ticks;
-                print($"It took {(recieveTime - sendTime) / 10000} milliseconds\n To recieve \"{e.Data}\"");
-            }
-        );
-        socketManager.AddCloseEvent((sender, e) => { print("Connection Closed"); });
+        //socketManager.SocketConnect(true);
+        //socketManager.AddMessageEvent(
+        //    (sender, e) => 
+        //    {
+        //        recieveTime = DateTime.Now.Ticks;
+        //        print($"It took {(recieveTime - sendTime) / 10000} milliseconds\n To recieve \"{e.Data}\"");
+        //    }
+        //);
+        //socketManager.AddCloseEvent((sender, e) => { print("Connection Closed"); });
         StartCoroutine(SendPositionInfinitely());
         StartCoroutine(SendPlayerCreatePacket());
     }
@@ -61,8 +60,9 @@ public class Player : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        socketManager.SocketSend($"{PacketNames.ohmygod:f},{nickname}");
-        socketManager.SocketClose();
+        //socketManager.SocketSend($"{PacketNames.ohmygod:f},{nickname}");
+        //socketManager.SocketClose();
+        ConnectionManager.PutMessage($"{PacketNames.ohmygod:f},{nickname}");
     }
 
     private void SendPositionPacket()
@@ -70,26 +70,25 @@ public class Player : MonoBehaviour
         var pos = transform.position;
         var packetString = $"{PacketNames.move:f},{nickname},{pos.x},{pos.y}";
         text.text = packetString;
-        
-        socketManager.SocketSend(packetString, true, (error) => { sendTime = DateTime.Now.Ticks; });
+
+        ConnectionManager.PutMessage(packetString, true, (error) => { sendTime = DateTime.Now.Ticks; });
+        //socketManager.SocketSend(packetString, true );
     }
 
     private IEnumerator SendPlayerCreatePacket()
     {
-        while (!established) yield return null;
-
         if (!isMine) yield break;
         
         var pos = transform.position;
         var packetString = $"{PacketNames.create:f},h,{nickname},{pos.x},{pos.y}";
         text.text = packetString;
-        
-        socketManager.SocketSend(packetString, true, (error) => { sendTime = DateTime.Now.Ticks; });
+
+        ConnectionManager.PutMessage(packetString, true, (error) => { sendTime = DateTime.Now.Ticks; });
+        //socketManager.SocketSend(packetString, true, (error) => { sendTime = DateTime.Now.Ticks; });
     }
 
     private IEnumerator SendPositionInfinitely()
     {
-        while (!established) yield return null;
 
         Debug.Log("Start sending position coroutine");
         while (true)

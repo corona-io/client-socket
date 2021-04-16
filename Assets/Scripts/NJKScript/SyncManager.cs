@@ -122,8 +122,7 @@ public class SyncManager : MonoBehaviour
             {
                 obj.transform.position += 
                     velocity * (Time.time - lastMoveTime)
-                +   0.5f * (velocity - lastVelo[name]) *
-                (Time.time - lastMoveTime) * (Time.time - lastMoveTime);
+                +   0.5f * (velocity - lastVelo[name]) * (Time.time - lastMoveTime) * (Time.time - lastMoveTime);
 
                 lastMoveTime = Time.time;
                 yield return new WaitForEndOfFrame();
