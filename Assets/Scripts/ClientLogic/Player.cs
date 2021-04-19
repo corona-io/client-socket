@@ -73,7 +73,7 @@ public class Player : MonoBehaviour
     {
         var pos = transform.position;
         var packetString = $"{PacketNames.move:f},{nickname},{pos.x},{pos.y}";
-        text.text = packetString;
+        //text.text = packetString;
 
         ConnectionManager.PutMessage(packetString, true, (error) => { sendTime = DateTime.Now.Ticks; });
         //socketManager.SocketSend(packetString, true );
@@ -85,7 +85,7 @@ public class Player : MonoBehaviour
 
         var pos = transform.position;
         var packetString = $"{PacketNames.create:f},h,{nickname},{pos.x},{pos.y}";
-        text.text = packetString;
+        //text.text = packetString;
 
         ConnectionManager.PutMessage(packetString, true, (error) => { sendTime = DateTime.Now.Ticks; });
         //socketManager.SocketSend(packetString, true, (error) => { sendTime = DateTime.Now.Ticks; });
