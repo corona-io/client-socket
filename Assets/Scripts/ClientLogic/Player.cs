@@ -23,7 +23,6 @@ public class Player : MonoBehaviour
     [SerializeField] private bool isMine;
     [SerializeField] private int healthPoint;
     [SerializeField] private float speed;
-    [SerializeField] private Text text;
     [SerializeField] private string nickname;
 
     private bool established;
@@ -39,7 +38,6 @@ public class Player : MonoBehaviour
         {
             print("Established!");
             established = true;
-            //StartCoroutine(SendPositionInfinitely());
         });
 
         socketManager.SocketConnect(true);
@@ -55,7 +53,7 @@ public class Player : MonoBehaviour
         StartCoroutine(SendPlayerCreatePacket());
         StartCoroutine(SendPositionInfinitely());
     }
-
+    
     private void Update()
     {
         if (isMine)
