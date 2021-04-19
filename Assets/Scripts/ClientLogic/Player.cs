@@ -73,6 +73,7 @@ public class Player : MonoBehaviour
     {
         var pos = transform.position;
         var packetString = $"{PacketNames.move:f},{nickname},{pos.x},{pos.y}";
+        UIManager.Instance.SetPacketMessage(packetString);
         //text.text = packetString;
 
         ConnectionManager.PutMessage(packetString, true, (error) => { sendTime = DateTime.Now.Ticks; });
@@ -85,6 +86,7 @@ public class Player : MonoBehaviour
 
         var pos = transform.position;
         var packetString = $"{PacketNames.create:f},h,{nickname},{pos.x},{pos.y}";
+        UIManager.Instance.SetPacketMessage(packetString);
         //text.text = packetString;
 
         ConnectionManager.PutMessage(packetString, true, (error) => { sendTime = DateTime.Now.Ticks; });
@@ -108,48 +110,5 @@ public class Player : MonoBehaviour
         var vertical = Input.GetAxis("Vertical");
 
         transform.Translate(new Vector3(horizon, vertical) * (speed * Time.deltaTime));
-    }
-
-    private string[] SplitPacket(string packet)
-    {
-        if (packet.StartsWith("brodcast: "))
-        {
-            return packet.Substring(10).Split(',');
-        }
-
-        return new string[0];
-    }
-
-    private PacketNames ConvertPacketToEnum(string packet)
-    {
-        return packet switch
-        {
-            "create" => PacketNames.create,
-            "move" => PacketNames.move,
-            "attack" => PacketNames.attack,
-            "damage" => PacketNames.damage,
-            "ohmygod" => PacketNames.ohmygod,
-            "lv999boss" => PacketNames.lv999boss,
-            _ => PacketNames.None
-        };
-    }
-
-    private void ExecuteActionByPacket(string[] packet)
-    {
-        if (packet.Length <= 0) return;
-
-        /*
-        ConvertPacketToEnum(packet[0]) switch
-        {
-            PacketNames.create => ,
-            PacketNames.move => ,
-            PacketNames.attack => ,
-            PacketNames.damage => ,
-            PacketNames.ohmygod => ,
-            PacketNames.lv999boss => ,
-            PacketNames.None => ,
-            _ => 
-        };
-        */
     }
 }
