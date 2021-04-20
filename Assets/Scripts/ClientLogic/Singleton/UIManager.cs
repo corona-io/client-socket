@@ -18,7 +18,13 @@ namespace ClientLogic.Singleton
 
         private void OnEnterNickname(string name)
         {
-            Instantiate(Resources.Load("Prefabs/player"), Vector3.zero, Quaternion.identity).name = name;
+            var plr = Instantiate(Resources.Load<Player>("Prefabs/player"), Vector3.zero, Quaternion.identity);
+            plr.name = name;
+            plr.nickname = name;
+            plr.isMine = true;
+
+            Instantiate(Resources.Load<SyncManager>("Prefabs/SyncManager")).localPlayerName = name;
+            
             nicknameInput.gameObject.SetActive(false);
         }
 

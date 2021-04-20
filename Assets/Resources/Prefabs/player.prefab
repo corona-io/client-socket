@@ -44,10 +44,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de43d3fe27734dd4480eeba79c0f37a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isMine: 1
+  isMine: 0
   healthPoint: 100
   speed: 30
-  text: {fileID: 0}
   nickname: Player
 --- !u!212 &6798439991964679047
 SpriteRenderer:
@@ -89,7 +88,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: a1db6fe14cf446144ac103be62ffda06, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 3cfe836ff10b41a4389e8e12350c6f54, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

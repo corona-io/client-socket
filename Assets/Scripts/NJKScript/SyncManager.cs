@@ -17,7 +17,8 @@ class InvalidTokenException : Exception
 public class SyncManager : MonoBehaviour
 {
     string? message;
-    public GameObject playerPrefab;
+    public string localPlayerName;
+    public Player playerPrefab;
     
     Dictionary<string, GameObject> entityPool;
     Dictionary<string, int> mutexPool;
@@ -59,12 +60,13 @@ public class SyncManager : MonoBehaviour
     void CreateEntity(string name, float x, float y) {
         if (entityPool.ContainsKey(name)) return;
         entityPool.Add(name, null);
-        GameObject go = Instantiate(
+        var go = Instantiate(
                     playerPrefab,
                     new Vector3(x, y, 0),
                     new Quaternion(0, 0, 0, 0)
                 );
-        entityPool[name] = go;
+        go.nickname = name;
+        entityPool[name] = go.gameObject;
         mutexPool.Add(name, 0);
         lastPacket.Add(name, Time.time);
         lastPos.Add(name, new Vector3(x, y, 0));
@@ -73,12 +75,14 @@ public class SyncManager : MonoBehaviour
 
     IEnumerator HandleCreateEvent(string[] tokens) 
     {
+        var name = tokens[2];
         entityPool.TryGetValue(tokens[1], out GameObject obj);
         if (obj is null)
         {
             if (tokens[1] == "h")
             {
-                CreateEntity(tokens[2], float.Parse(tokens[3]), float.Parse(tokens[4]));
+                if(!name.Equals(localPlayerName))
+                    CreateEntity(name, float.Parse(tokens[3]), float.Parse(tokens[4]));
             }
             else
             {
@@ -96,7 +100,8 @@ public class SyncManager : MonoBehaviour
         if (obj is null)
         {
             // moving an object that doesnt exist???
-            CreateEntity(name, float.Parse(tokens[2]), float.Parse(tokens[3]));
+            if(!name.Equals(localPlayerName))
+                CreateEntity(name, float.Parse(tokens[2]), float.Parse(tokens[3]));
         }
         else 
         {

@@ -20,10 +20,10 @@ public class Player : MonoBehaviour
 {
     private readonly SocketManager socketManager = SocketManager.GetSingleton();
 
-    [SerializeField] private bool isMine;
+    [SerializeField] public bool isMine;
     [SerializeField] private int healthPoint;
     [SerializeField] private float speed;
-    [SerializeField] private string nickname;
+    [SerializeField] public string nickname;
 
     private bool established;
     
@@ -49,7 +49,7 @@ public class Player : MonoBehaviour
         //    }
         //);
         //socketManager.AddCloseEvent((sender, e) => { print("Connection Closed"); });
-        StartCoroutine(SendPositionInfinitely());
+        //StartCoroutine(SendPositionInfinitely());
         StartCoroutine(SendPlayerCreatePacket());
         StartCoroutine(SendPositionInfinitely());
     }
