@@ -29,27 +29,13 @@ public class Player : MonoBehaviour
     
     private long recieveTime, sendTime = 0;
 
+    public void Attack(Vector2 dir)
+    {
+        
+    }
+    
     private void Start()
     {
-        //socketManager.SocketInit("ws://hojoondev.kro.kr:3001", true);
-        
-        //socketManager.AddOpenEvent((sender, e) =>
-        //{
-        //    print("Established!");
-        //    established = true;
-            //StartCoroutine(SendPositionInfinitely());
-        //});
-        
-        //socketManager.SocketConnect(true);
-        //socketManager.AddMessageEvent(
-        //    (sender, e) => 
-        //    {
-        //        recieveTime = DateTime.Now.Ticks;
-        //        print($"It took {(recieveTime - sendTime) / 10000} milliseconds\n To recieve \"{e.Data}\"");
-        //    }
-        //);
-        //socketManager.AddCloseEvent((sender, e) => { print("Connection Closed"); });
-        //StartCoroutine(SendPositionInfinitely());
         StartCoroutine(SendPlayerCreatePacket());
         StartCoroutine(SendPositionInfinitely());
     }
