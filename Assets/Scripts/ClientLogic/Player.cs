@@ -24,6 +24,7 @@ public class Player : MonoBehaviour
     [SerializeField] private int healthPoint;
     [SerializeField] private float speed;
     [SerializeField] public string nickname;
+    private Animator animator;
 
     private bool established;
     
@@ -36,6 +37,7 @@ public class Player : MonoBehaviour
     
     private void Start()
     {
+        animator = GetComponent<Animator>();
         StartCoroutine(SendPlayerCreatePacket());
         StartCoroutine(SendPositionInfinitely());
     }
@@ -95,6 +97,23 @@ public class Player : MonoBehaviour
         var horizon = Input.GetAxis("Horizontal");
         var vertical = Input.GetAxis("Vertical");
 
-        transform.Translate(new Vector3(horizon, vertical) * (speed * Time.deltaTime));
+        if (horizon + vertical != 0)
+        {
+            var scale = transform.localScale;
+            var x = Mathf.Abs(scale.x);
+
+            if (horizon < 0)
+            {
+                x *= -1;
+                scale.x = x;
+                transform.localScale = scale;
+            }
+            else if(horizon > 0)
+            {
+                scale.x = x;
+                transform.localScale = scale;
+            }
+            transform.Translate(new Vector3(horizon, vertical) * (speed * Time.deltaTime));
+        }
     }
 }
