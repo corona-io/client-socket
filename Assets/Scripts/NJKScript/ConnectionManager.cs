@@ -61,8 +61,11 @@ public class ConnectionManager : MonoBehaviour
     }
 #nullable disable
 
-    public static void PutMessage(string arg, bool asyncSend=false, Action<bool> callback=null) 
-        => outputMessageQueue.Enqueue(new PacketInfo(arg, asyncSend, callback));
+    public static void PutMessage(string arg, bool asyncSend = false, Action<bool> callback = null)
+    {
+        if (asyncSend) outputMessageQueue.Enqueue(new PacketInfo(arg, asyncSend, callback));
+        else globalSocket.SocketSend(arg, asyncSend, callback);
+    }
 
     IEnumerator GlobalSocketLoop()
     {
@@ -88,6 +91,13 @@ public class ConnectionManager : MonoBehaviour
             }
             
             yield return null;
+        }
+
+        // flush output queue
+        while (outputMessageQueue.Count > 0)
+        {
+            var item = outputMessageQueue.Dequeue();
+            globalSocket.SocketSend(item.packetString, false, item.callback);
         }
 
         globalSocket.SocketClose(false);

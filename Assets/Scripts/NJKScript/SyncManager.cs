@@ -76,12 +76,13 @@ public class SyncManager : MonoBehaviour
     IEnumerator HandleCreateEvent(string[] tokens) 
     {
         var name = tokens[2];
+        if (name == localPlayerName) yield break;
         entityPool.TryGetValue(tokens[1], out GameObject obj);
         if (obj is null)
         {
             if (tokens[1] == "h")
             {
-                if(!name.Equals(localPlayerName))
+                if (!name.Equals(localPlayerName))
                     CreateEntity(name, float.Parse(tokens[3]), float.Parse(tokens[4]));
             }
             else
@@ -95,17 +96,17 @@ public class SyncManager : MonoBehaviour
     IEnumerator HandleMoveEvent(string[] tokens) 
     {
         var name = tokens[1];
-
+        if (name == localPlayerName) yield break;
         entityPool.TryGetValue(name, out GameObject obj);
         if (obj is null)
         {
             // moving an object that doesnt exist???
-            if(!name.Equals(localPlayerName))
-                CreateEntity(name, float.Parse(tokens[2]), float.Parse(tokens[3]));
+            CreateEntity(name, float.Parse(tokens[2]), float.Parse(tokens[3]));
         }
         else 
         {
-            
+            print($"MOVE CMD: {name} {tokens[2]} {tokens[3]}");
+
             Vector3 newPos, velocity;
             float lastMoveTime;
 
