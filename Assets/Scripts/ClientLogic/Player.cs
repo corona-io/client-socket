@@ -29,6 +29,7 @@ public class Player : MonoBehaviour
     private bool established;
     
     private long recieveTime, sendTime = 0;
+    private static readonly int IsMoving = Animator.StringToHash("IsMoving");
 
     public void Attack(Vector2 dir)
     {
@@ -113,7 +114,14 @@ public class Player : MonoBehaviour
                 scale.x = x;
                 transform.localScale = scale;
             }
+            
             transform.Translate(new Vector3(horizon, vertical) * (speed * Time.deltaTime));
+
+            animator.SetBool(IsMoving, true);
+        }
+        else
+        {
+            animator.SetBool(IsMoving, false);
         }
     }
 }
