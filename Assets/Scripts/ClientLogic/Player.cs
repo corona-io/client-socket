@@ -25,8 +25,6 @@ public class Player : MonoBehaviour
     [SerializeField] private float speed;
     [SerializeField] public string nickname;
     private Animator animator;
-
-    private bool established;
     
     private long recieveTime, sendTime = 0;
     private static readonly int IsMoving = Animator.StringToHash("IsMoving");
@@ -86,7 +84,7 @@ public class Player : MonoBehaviour
     {
 
         Debug.Log("Start sending position coroutine");
-        while (true)
+        while (isMine)
         {
             SendPositionPacket();
             yield return new WaitForSeconds(.1f);
