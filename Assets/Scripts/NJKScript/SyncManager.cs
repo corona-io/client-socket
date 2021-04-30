@@ -93,7 +93,7 @@ public class SyncManager : MonoBehaviour
 
         yield break; 
     }   
-    IEnumerator HandleMoveEvent(string[] tokens) 
+    IEnumerator HandleMoveEvent(string[] tokens)
     {
         var name = tokens[1];
         if (name == localPlayerName) yield break;
