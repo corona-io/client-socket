@@ -55,6 +55,7 @@ public class SocketManager
     /// </summary>
     public void DeleteRecentOpenEvent()
     {
+        if (openEventHandlers.Count < 1) return;
         var handler = openEventHandlers[openEventHandlers.Count - 1];
         userSocket.OnOpen -= handler;
         openEventHandlers.RemoveAt(openEventHandlers.Count - 1);
@@ -92,6 +93,7 @@ public class SocketManager
     /// </summary>
     public void DeleteRecentMessageEvent()
     {
+        if (messageEventHandlers.Count < 1) return;
         var handler = messageEventHandlers[messageEventHandlers.Count - 1];
         userSocket.OnMessage -= handler;
         messageEventHandlers.RemoveAt(messageEventHandlers.Count - 1);
@@ -129,6 +131,7 @@ public class SocketManager
     /// </summary>
     public void DeleteRecentErrorEvent()
     {
+        if (errorEventHandlers.Count < 1) return;
         var handler = errorEventHandlers[errorEventHandlers.Count - 1];
         userSocket.OnError -= handler;
         errorEventHandlers.RemoveAt(errorEventHandlers.Count - 1);
@@ -166,9 +169,10 @@ public class SocketManager
     /// </summary>
     public void DeleteRecentCloseEvent()
     {
-        var handler = openEventHandlers[openEventHandlers.Count - 1];
-        userSocket.OnOpen -= handler;
-        openEventHandlers.RemoveAt(openEventHandlers.Count - 1);
+        if (closeEventHandlers.Count < 1) return;
+        var handler = closeEventHandlers[closeEventHandlers.Count - 1];
+        userSocket.OnClose -= handler;
+        closeEventHandlers.RemoveAt(closeEventHandlers.Count - 1);
     }
 
 

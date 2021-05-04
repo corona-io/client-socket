@@ -7,26 +7,12 @@ using System.Collections;
 public class ConnectionTest : MonoBehaviour
 {
     private SocketManager manager = SocketManager.GetSingleton();
-    private WebSocket socket;
     private long recieveTime, sendTime = 0;
-    private bool established = false, stopSending = false;
-
-    private EventHandler<MessageEventArgs> messageHandler;
+    private bool stopSending = false;
 
     // Start is called before the first frame update
     void Start()
     {
-        manager.SocketInit("ws://hojoondev.kro.kr:3001", true);
-        manager.AddOpenEvent((sender, e) => { print("Established!"); });
-        manager.AddMessageEvent(
-            (sender, e) => 
-            {
-                print($" RECIEVED \"{e.Data}\", commencing latency test");
-                established = true;
-            }
-        );
-        manager.AddCloseEvent((sender, e) => { print("Connection Closed"); });
-
         StartCoroutine(TestSocket());
     }
 
@@ -38,12 +24,6 @@ public class ConnectionTest : MonoBehaviour
 
     IEnumerator TestSocket() 
     {
-
-        manager.SocketConnect(true);
-
-        while (!established) yield return new WaitForEndOfFrame();
-
-        manager.DeleteRecentMessageEvent();
         manager.AddMessageEvent(
             (sender, e) => 
             {
@@ -73,11 +53,9 @@ public class ConnectionTest : MonoBehaviour
 "                                                                                                                                                                \n";
         for (; !stopSending; )
         {
-            manager.SocketSend(words, true, (error) => {sendTime = DateTime.Now.Ticks; });
+            ConnectionManager.PutMessage(words, true, (error) => {sendTime = DateTime.Now.Ticks; });
             yield return new WaitForSeconds(10f);
         }
-
-        manager.SocketClose(false);
         yield break;
     }
 }

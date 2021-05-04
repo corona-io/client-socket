@@ -28,14 +28,7 @@ public class ConnectionManager : MonoBehaviour
         {
             terminated = false;
             globalSocket.SocketInit("ws://hojoondev.kro.kr:3001", true);
-            globalSocket.AddOpenEvent((sender, e) => { print("Established!"); });
-            globalSocket.AddMessageEvent(
-                (sender, e) =>
-                {
-                    print($" RECIEVED \"{e.Data}\", communicating with socket");
-                    established = true;
-                }
-            );
+            globalSocket.AddOpenEvent((sender, e) => { print("Established!"); established = true; });
             globalSocket.AddCloseEvent((sender, e) => { print("Connection Closed"); });
         }
         StartCoroutine(GlobalSocketLoop());
@@ -85,7 +78,8 @@ public class ConnectionManager : MonoBehaviour
                     inputMessageQueue.Enqueue(message);
                 }
             );
-            if (outputMessageQueue.Count > 0) { 
+            if (outputMessageQueue.Count > 0) {
+                print(outputMessageQueue.Count);
                 var item = outputMessageQueue.Dequeue();
                 globalSocket.SocketSend(item.packetString, item.asyncSend, item.callback);
             }
