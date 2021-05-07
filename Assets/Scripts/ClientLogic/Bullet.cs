@@ -11,7 +11,6 @@ public class Bullet : MonoBehaviour
     
     public Vector3 Direction { get; set; }
 
-    // Update is called once per frame
     void Update()
     {
         transform.Translate(Direction * (Time.deltaTime * Speed));
@@ -19,8 +18,10 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        Debug.Log("trigger enter");
         if (other.gameObject.layer == EnemyLayer)
         {
+            Debug.Log("enemy enter");
             var enemy = other.GetComponent<Enemy>();
             enemy.Hurt(10);
         }

@@ -22,6 +22,7 @@ namespace ClientLogic.Singleton
             plr.name = name;
             plr.nickname = name;
             plr.isMine = true;
+            plr.gameObject.AddComponent<CameraMover>();
 
             Instantiate(Resources.Load<SyncManager>("Prefabs/SyncManager")).localPlayerName = name;
             

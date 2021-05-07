@@ -35,7 +35,6 @@ public partial class Player : MonoBehaviour
         var bullet = ObjectPoolManager.Instance.Dequeue(ObjectPoolManager.PoolingObjects.Bullet);
         bullet.GetComponent<Bullet>().Direction = dir;
         bullet.position = transform.position;
-        Debug.Log($"Direction : {dir}");
     }
     
     private void Start()
@@ -78,7 +77,6 @@ public partial class Player : MonoBehaviour
         //text.text = packetString;
 
         ConnectionManager.PutMessage(packetString, true, (error) => { sendTime = DateTime.Now.Ticks; });
-        //socketManager.SocketSend(packetString, true, (error) => { sendTime = DateTime.Now.Ticks; });
     }
 
     private IEnumerator SendPositionInfinitely()
