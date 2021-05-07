@@ -22,7 +22,6 @@ public class TestEnemy : Enemy
     {
         enemState.action(this);
         State<TestEnemy> currState = enemState.UpdateState(this);
-
         if (currState.GetType() != enemState.GetType()) { enemState = currState; }
     }
 
@@ -67,7 +66,6 @@ public class TestEnemy : Enemy
         {
             base.EnterState(entity);
             
-            Destroy(entity.alertArea);
             Destroy(entity.GetComponent<Collider2D>());
             Destroy(entity.gameObject, 1.5f);
 
@@ -106,8 +104,9 @@ public class TestEnemy : Enemy
             if (entity.healthPoint <= 0) return new DeathState();
 
             var colliders = new List<Collider2D>();
-            entity.alertArea.OverlapCollider(new ContactFilter2D(), colliders);
-
+            Physics2D.OverlapCircle(entity.transform.position, entity.alertRadius);
+            print(colliders.Count);
+            
             foreach (var x in colliders) {
                 
                 if (x.gameObject.GetComponent<Player>())
@@ -116,7 +115,6 @@ public class TestEnemy : Enemy
                     return new AlertedState();
                 }
             }
-
             return this;
         }
 
@@ -125,6 +123,7 @@ public class TestEnemy : Enemy
             var vect = new Vector3(Mathf.Sin(entity.moveAngle), Mathf.Cos(entity.moveAngle), 0);
             entity.transform.Translate(vect.normalized * entity.speed * Time.deltaTime);
             entity.moveAngle += Random.Range(-.05f, .05f);
+            entity.invTime -= Time.deltaTime;
         }
     }
 
@@ -139,15 +138,15 @@ public class TestEnemy : Enemy
         {
             var dir = (entity.target.position - entity.transform.position).normalized;
             entity.transform.Translate(dir * entity.speed * Time.deltaTime);
+            entity.invTime -= Time.deltaTime;
         }
 
         public override State<TestEnemy> UpdateState(TestEnemy entity)
         {
             if (entity.healthPoint <= 0) return new DeathState();
 
-            var radius = entity.alertArea.radius;
             var dist = (entity.target.position - entity.transform.position).magnitude;
-            if (dist > radius * 1.5f) return new IdleState();
+            if (dist > entity.alertRadius * 1.5f) return new IdleState();
             return this;
         }
     }

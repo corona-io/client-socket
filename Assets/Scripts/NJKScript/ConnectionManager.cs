@@ -79,7 +79,6 @@ public class ConnectionManager : MonoBehaviour
                 }
             );
             if (outputMessageQueue.Count > 0) {
-                print(outputMessageQueue.Count);
                 var item = outputMessageQueue.Dequeue();
                 globalSocket.SocketSend(item.packetString, item.asyncSend, item.callback);
             }

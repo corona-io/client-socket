@@ -9,7 +9,7 @@ public abstract class Enemy : MonoBehaviour
     public Transform target;
 
     public string enemyName;
-    public CircleCollider2D alertArea;
+    public float alertRadius;
 
     public void Hurt(int dmg) 
     { 
