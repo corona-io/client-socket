@@ -31,7 +31,7 @@ public class ObjectPoolManager : Singleton<ObjectPoolManager>
         }
         else
         {
-            obj = Instantiate<Transform>(Resources.Load<Transform>(TypeToPath(type)));
+            obj = Instantiate(Resources.Load<Transform>(TypeToPath(type)));
         }
 
         return obj;

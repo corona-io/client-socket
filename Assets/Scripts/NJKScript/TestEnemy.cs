@@ -107,8 +107,7 @@ public class TestEnemy : Enemy
 
             var colliders = new List<Collider2D>();
             entity.alertArea.OverlapCollider(new ContactFilter2D(), colliders);
-            print(colliders.Count);
-            
+
             foreach (var x in colliders) {
                 
                 if (x.gameObject.GetComponent<Player>())
