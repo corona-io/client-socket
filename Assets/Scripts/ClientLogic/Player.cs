@@ -16,7 +16,7 @@ public enum PacketNames
     None
 }
 
-public class Player : MonoBehaviour
+public partial class Player : MonoBehaviour
 {
     private readonly SocketManager socketManager = SocketManager.GetSingleton();
 
@@ -24,14 +24,18 @@ public class Player : MonoBehaviour
     [SerializeField] private int healthPoint;
     [SerializeField] private float speed;
     [SerializeField] public string nickname;
-    private Animator animator;
     
+    private Animator animator;
     private long recieveTime, sendTime = 0;
+    private State<Player> nowState;
     private static readonly int IsMoving = Animator.StringToHash("IsMoving");
 
-    public void Attack(Vector2 dir)
+    public void Attack(Vector3 dir)
     {
-        
+        var bullet = ObjectPoolManager.Instance.Dequeue(ObjectPoolManager.PoolingObjects.Bullet);
+        bullet.GetComponent<Bullet>().Direction = dir;
+        bullet.position = transform.position;
+        Debug.Log($"Direction : {dir}");
     }
     
     private void Start()
@@ -46,13 +50,12 @@ public class Player : MonoBehaviour
         if (isMine)
         {
             MoveWithInput();
+            AttackWithInput();
         }
     }
 
     private void OnApplicationQuit()
     {
-        //socketManager.SocketSend($"{PacketNames.ohmygod:f},{nickname}");
-        //socketManager.SocketClose();
         ConnectionManager.PutMessage($"{PacketNames.ohmygod:f},{nickname}");
     }
 
@@ -61,10 +64,8 @@ public class Player : MonoBehaviour
         var pos = transform.position;
         var packetString = $"{PacketNames.move:f},{nickname},{pos.x},{pos.y}";
         UIManager.Instance.SetPacketMessage(packetString);
-        //text.text = packetString;
 
         ConnectionManager.PutMessage(packetString, true, (error) => { sendTime = DateTime.Now.Ticks; });
-        //socketManager.SocketSend(packetString, true );
     }
 
     private IEnumerator SendPlayerCreatePacket()
@@ -120,6 +121,36 @@ public class Player : MonoBehaviour
         else
         {
             animator.SetBool(IsMoving, false);
+        }
+    }
+
+    private void AttackWithInput()
+    {
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            var target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            var dir = target - transform.position;
+            float angle = Mathf.Atan2(dir.y, dir.x) - Mathf.PI / 2;
+            Attack(new Vector3(-Mathf.Sin(angle), Mathf.Cos(angle), 0));
+        }
+    }
+}
+
+public partial class Player : MonoBehaviour
+{
+    public class IdleState : State<Player>
+    {
+        public override State<Player> UpdateState(Player entity)
+        {
+            return this;
+        }
+    }
+
+    public class RollingState : State<Player>
+    {
+        public override State<Player> UpdateState(Player entity)
+        {
+            throw new NotImplementedException();
         }
     }
 }
