@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 1970850224970097618}
   - component: {fileID: 1535587552911143649}
   - component: {fileID: 3200086346080846758}
-  - component: {fileID: 4730264020077643178}
   - component: {fileID: 7751490772471354979}
   m_Layer: 3
   m_Name: testEnemy
@@ -101,22 +100,6 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
---- !u!58 &4730264020077643178
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4566930194843867178}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  serializedVersion: 2
-  m_Radius: 5
 --- !u!114 &7751490772471354979
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -131,4 +114,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 0}
   enemyName: lmfao
-  alertArea: {fileID: 4730264020077643178}
+  alertRadius: 5

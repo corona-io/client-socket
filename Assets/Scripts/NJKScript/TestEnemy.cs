@@ -20,6 +20,7 @@ public class TestEnemy : Enemy
 
     void Update()
     {
+        print(invTime);
         enemState.action(this);
         State<TestEnemy> currState = enemState.UpdateState(this);
         if (currState.GetType() != enemState.GetType()) { enemState = currState; }
@@ -39,6 +40,7 @@ public class TestEnemy : Enemy
         {
             if (timer <= 0f)
             {
+                entity.invTime = 0f;
                 entity.GetComponent<SpriteRenderer>().color = Color.white;
                 return new IdleState();
             }
@@ -75,9 +77,13 @@ public class TestEnemy : Enemy
         public override void StateBehavior(TestEnemy entity)
         {
             base.StateBehavior(entity);
-            timer -= Time.deltaTime;
-            entity.GetComponent<SpriteRenderer>().color =
-                new Vector4(1, 1, 1, .5f + Mathf.Sin(Mathf.PI * (timer - .5f)) / 2);
+
+            if (timer > 0f)
+            { 
+                timer -= Time.deltaTime;
+                entity.GetComponent<SpriteRenderer>().color =
+                    new Vector4(1, 1, 1, .5f + Mathf.Sin(Mathf.PI * (timer - .5f)) / 2);
+            }
         }
 
         public override State<TestEnemy> UpdateState(TestEnemy entity)
@@ -103,10 +109,7 @@ public class TestEnemy : Enemy
         {
             if (entity.healthPoint <= 0) return new DeathState();
 
-            var colliders = new List<Collider2D>();
-            Physics2D.OverlapCircle(entity.transform.position, entity.alertRadius);
-            print(colliders.Count);
-            
+            var colliders = Physics2D.OverlapCircleAll(entity.transform.position, entity.alertRadius);
             foreach (var x in colliders) {
                 
                 if (x.gameObject.GetComponent<Player>())
