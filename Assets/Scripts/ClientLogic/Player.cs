@@ -18,15 +18,12 @@ public enum PacketNames
 
 public partial class Player : MonoBehaviour
 {
-    private readonly SocketManager socketManager = SocketManager.GetSingleton();
-
     [SerializeField] public bool isMine;
     [SerializeField] private int healthPoint;
     [SerializeField] private float speed;
     [SerializeField] public string nickname;
     
     private Animator animator;
-    private long recieveTime, sendTime = 0;
     private State<Player> nowState;
     private static readonly int IsMoving = Animator.StringToHash("IsMoving");
 
@@ -35,6 +32,11 @@ public partial class Player : MonoBehaviour
         var bullet = ObjectPoolManager.Instance.Dequeue(ObjectPoolManager.PoolingObjects.Bullet);
         bullet.GetComponent<Bullet>().Direction = dir;
         bullet.position = transform.position;
+    }
+
+    public void Hurt()
+    {
+        
     }
     
     private void Start()
@@ -64,7 +66,7 @@ public partial class Player : MonoBehaviour
         var packetString = $"{PacketNames.move:f},{nickname},{pos.x},{pos.y}";
         UIManager.Instance.SetPacketMessage(packetString);
 
-        ConnectionManager.PutMessage(packetString, true, (error) => { sendTime = DateTime.Now.Ticks; });
+        ConnectionManager.PutMessage(packetString, true, (error) => { });
     }
 
     private IEnumerator SendPlayerCreatePacket()
@@ -76,7 +78,7 @@ public partial class Player : MonoBehaviour
         UIManager.Instance.SetPacketMessage(packetString);
         //text.text = packetString;
 
-        ConnectionManager.PutMessage(packetString, true, (error) => { sendTime = DateTime.Now.Ticks; });
+        ConnectionManager.PutMessage(packetString, true, (error) => { });
     }
 
     private IEnumerator SendPositionInfinitely()
@@ -140,15 +142,43 @@ public partial class Player : MonoBehaviour
     {
         public override State<Player> UpdateState(Player entity)
         {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                return new RollingState();
+            }
+
             return this;
         }
     }
 
     public class RollingState : State<Player>
     {
+        private float leftRollingTime;
+
+        public override void EnterState(Player entity)
+        {
+            base.EnterState(entity);
+            leftRollingTime = 0.5f;
+        }
+
         public override State<Player> UpdateState(Player entity)
         {
-            throw new NotImplementedException();
+            if (leftRollingTime > 0f)
+            {
+                return this;
+            }
+            return new IdleState();
+        }
+
+        public override void StateBehavior(Player entity)
+        {
+            base.StateBehavior(entity);
+            leftRollingTime -= Time.deltaTime;
+        }
+
+        public override void ExitState(Player entity)
+        {
+            base.ExitState(entity);
         }
     }
 }
