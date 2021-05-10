@@ -7,6 +7,7 @@ using Random = System.Random;
 public class Bullet : MonoBehaviour
 {
     private const int EnemyLayer = 3;
+    private const int PlayerLayer = 6;
     private const float Speed = 10f;
     
     public Vector3 Direction { get; set; }
@@ -18,12 +19,22 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("trigger enter");
-        if (other.gameObject.layer == EnemyLayer)
+        if (other.CompareTag("Enemy"))
         {
             Debug.Log("enemy enter");
             var enemy = other.GetComponent<Enemy>();
             enemy.Hurt(10);
         }
+
+        if (!CanPassLayer(gameObject.layer, other.gameObject.layer, other.tag))
+        {
+            Debug.Log($"{other.name}");
+            gameObject.SetActive(false);
+        }
+    }
+
+    private bool CanPassLayer(int origin, int otherLayer, string tag)
+    {
+        return (tag.Equals("Untagged") && origin > otherLayer) || tag.Equals("Player");
     }
 }

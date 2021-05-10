@@ -33,6 +33,8 @@ public partial class Player : MonoBehaviour
         var bullet = ObjectPoolManager.Instance.Dequeue(ObjectPoolManager.PoolingObjects.Bullet);
         bullet.GetComponent<Bullet>().Direction = dir;
         bullet.position = transform.position;
+//        bullet.SetParent(transform);
+        bullet.GetComponent<SpriteRenderer>().sortingOrder = bullet.gameObject.layer = gameObject.layer;
     }
 
     public void Hurt()
@@ -121,7 +123,6 @@ public partial class Player : MonoBehaviour
             vertical = vertical != 0 ? vertical < 0 ? -1 : 1 : 0;
 
             animator.SetBool(IsMoving, true);
-            Debug.Log($"horizon : {horizon}, vertical : {vertical}");
         }
         else
         {
