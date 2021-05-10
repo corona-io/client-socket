@@ -7,7 +7,7 @@ using Random = System.Random;
 public class Bullet : MonoBehaviour
 {
     private const int EnemyLayer = 3;
-    private const float Speed = 50f;
+    private const float Speed = 10f;
     
     public Vector3 Direction { get; set; }
 
