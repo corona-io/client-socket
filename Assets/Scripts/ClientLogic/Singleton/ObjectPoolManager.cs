@@ -10,10 +10,16 @@ public class ObjectPoolManager : Singleton<ObjectPoolManager>
     {
         Bullet = 1
     }
-    
-    private Dictionary<PoolingObjects, Queue<Transform>> objectQueues = Enum.GetValues(typeof(PoolingObjects))
-        .OfType<PoolingObjects>()
-        .ToDictionary(x => x, x => new Queue<Transform>());
+
+    private Dictionary<PoolingObjects, Queue<Transform>> objectQueues;
+
+    protected override void OnAwake()
+    {
+        base.OnAwake();
+        objectQueues = Enum.GetValues(typeof(PoolingObjects))
+            .OfType<PoolingObjects>()
+            .ToDictionary(x => x, x => new Queue<Transform>());
+    }
 
     public void Enqueue(PoolingObjects type, Transform obj)
     {
