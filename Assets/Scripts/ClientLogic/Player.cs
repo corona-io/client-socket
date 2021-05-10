@@ -24,6 +24,7 @@ public partial class Player : MonoBehaviour
     [SerializeField] public string nickname;
     
     private Animator animator;
+    private Rigidbody2D rigidbody;
     private State<Player> nowState;
     private static readonly int IsMoving = Animator.StringToHash("IsMoving");
 
@@ -42,6 +43,7 @@ public partial class Player : MonoBehaviour
     private void Start()
     {
         animator = GetComponent<Animator>();
+        rigidbody = GetComponent<Rigidbody2D>();
         StartCoroutine(SendPlayerCreatePacket());
         StartCoroutine(SendPositionInfinitely());
     }
@@ -107,21 +109,26 @@ public partial class Player : MonoBehaviour
                 x *= -1;
                 scale.x = x;
                 transform.localScale = scale;
+                horizon = -1;
             }
             else if(horizon > 0)
             {
                 scale.x = x;
+                horizon = 1;
                 transform.localScale = scale;
             }
-            
-            transform.Translate(new Vector3(horizon, vertical) * (speed * Time.deltaTime));
+
+            vertical = vertical != 0 ? vertical < 0 ? -1 : 1 : 0;
 
             animator.SetBool(IsMoving, true);
+            Debug.Log($"horizon : {horizon}, vertical : {vertical}");
         }
         else
         {
             animator.SetBool(IsMoving, false);
         }
+        
+        rigidbody.velocity = new Vector2(horizon, vertical).normalized * (speed);
     }
 
     private void AttackWithInput()
