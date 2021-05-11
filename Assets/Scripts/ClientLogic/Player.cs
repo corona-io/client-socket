@@ -25,7 +25,6 @@ public partial class Player : MonoBehaviour
     
     private Animator animator;
     private Rigidbody2D rigidbody;
-    private SpriteRenderer renderer;
     private State<Player> nowState;
     private static readonly int IsMoving = Animator.StringToHash("IsMoving");
 
@@ -34,10 +33,8 @@ public partial class Player : MonoBehaviour
         var bullet = ObjectPoolManager.Instance.Dequeue(ObjectPoolManager.PoolingObjects.Bullet);
         bullet.GetComponent<Bullet>().Direction = dir;
         bullet.position = transform.position;
-        bullet.gameObject.layer = gameObject.layer;
-        var bulletSprite = bullet.GetComponent<SpriteRenderer>();
-        bulletSprite.sortingLayerName = renderer.sortingLayerName;
-        bulletSprite.sortingOrder = renderer.sortingOrder;
+//        bullet.SetParent(transform);
+        bullet.GetComponent<SpriteRenderer>().sortingOrder = bullet.gameObject.layer = gameObject.layer;
     }
 
     public void Hurt()
@@ -49,7 +46,6 @@ public partial class Player : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         rigidbody = GetComponent<Rigidbody2D>();
-        renderer = GetComponent<SpriteRenderer>();
         StartCoroutine(SendPlayerCreatePacket());
         StartCoroutine(SendPositionInfinitely());
     }

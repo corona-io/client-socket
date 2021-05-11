@@ -25,18 +25,16 @@ public class Bullet : MonoBehaviour
             var enemy = other.GetComponent<Enemy>();
             enemy.Hurt(10);
         }
-        
-        Debug.Log($"trigger : {other.name}");
 
         if (!CanPassLayer(gameObject.layer, other.gameObject.layer, other.tag))
         {
-            Debug.Log($"destroy : {other.name}");
+            Debug.Log($"{other.name}");
             gameObject.SetActive(false);
         }
     }
 
     private bool CanPassLayer(int origin, int otherLayer, string tag)
     {
-        return (tag.Equals("Untagged") && origin != otherLayer) || tag.Equals("Player");
+        return (tag.Equals("Untagged") && origin > otherLayer) || tag.Equals("Player");
     }
 }
