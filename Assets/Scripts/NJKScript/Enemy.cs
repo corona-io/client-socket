@@ -22,6 +22,12 @@ public abstract class Enemy : MonoBehaviour
         StartCoroutine(SendCreatePacket());
         StartCoroutine(SendPositionInfinitely());
     }
+    
+    void OnDestroy()
+    {
+        var packetString = $"{PacketNames.ohmygod:f},{enemyName}";
+        ConnectionManager.PutMessage(packetString, true, null);
+    }
 
     private IEnumerator SendCreatePacket()
     {
