@@ -20,7 +20,6 @@ public class TestEnemy : Enemy
 
     void Update()
     {
-        print(invTime);
         enemState.action(this);
         State<TestEnemy> currState = enemState.UpdateState(this);
         if (currState.GetType() != enemState.GetType()) { enemState = currState; }
@@ -108,21 +107,25 @@ public class TestEnemy : Enemy
         public override State<TestEnemy> UpdateState(TestEnemy entity)
         {
             if (entity.healthPoint <= 0) return new DeathState();
+            if (!entity.isMine) return this;
 
             var colliders = Physics2D.OverlapCircleAll(entity.transform.position, entity.alertRadius);
-            foreach (var x in colliders) {
-                
-                if (x.gameObject.GetComponent<Player>())
+                foreach (var x in colliders)
                 {
-                    entity.target = x.transform;
-                    return new AlertedState();
+
+                    if (x.gameObject.GetComponent<Player>())
+                    {
+                        entity.target = x.transform;
+                        return new AlertedState();
+                    }
                 }
-            }
             return this;
         }
 
         public override void StateBehavior(TestEnemy entity)
         {
+            if (!entity.isMine) return;
+
             var vect = new Vector3(Mathf.Sin(entity.moveAngle), Mathf.Cos(entity.moveAngle), 0);
             entity.transform.Translate(vect.normalized * entity.speed * Time.deltaTime);
             entity.moveAngle += Random.Range(-.05f, .05f);
