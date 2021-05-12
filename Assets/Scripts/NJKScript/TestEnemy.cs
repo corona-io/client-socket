@@ -20,7 +20,6 @@ public class TestEnemy : Enemy
 
     void Update()
     {
-        print(invTime);
         enemState.action(this);
         State<TestEnemy> currState = enemState.UpdateState(this);
         if (currState.GetType() != enemState.GetType()) { enemState = currState; }

@@ -19,6 +19,7 @@ public class SyncManager : MonoBehaviour
     string? message;
     public string localPlayerName;
     public Player playerPrefab;
+    public Enemy enemyPrefab;
     
     Dictionary<string, GameObject> entityPool;
     Dictionary<string, int> mutexPool;
@@ -57,20 +58,39 @@ public class SyncManager : MonoBehaviour
         }
     }
 
-    void CreateEntity(string name, float x, float y) {
+    void CreateEntity(bool isPlayer, string name, float x, float y) {
         if (entityPool.ContainsKey(name)) return;
         entityPool.Add(name, null);
-        var go = Instantiate(
+
+        if (isPlayer)
+        {
+            var go = Instantiate(
                     playerPrefab,
                     new Vector3(x, y, 0),
                     new Quaternion(0, 0, 0, 0)
                 );
-        go.nickname = name;
-        entityPool[name] = go.gameObject;
-        mutexPool.Add(name, 0);
-        lastPacket.Add(name, Time.time);
-        lastPos.Add(name, new Vector3(x, y, 0));
-        lastVelo.Add(name, new Vector3(0, 0, 0));
+            go.nickname = name;
+            entityPool[name] = go.gameObject;
+            mutexPool.Add(name, 0);
+            lastPacket.Add(name, Time.time);
+            lastPos.Add(name, new Vector3(x, y, 0));
+            lastVelo.Add(name, new Vector3(0, 0, 0));
+        }
+
+        else 
+        {
+            var go = Instantiate(
+                    enemyPrefab,
+                    new Vector3(x, y, 0),
+                    new Quaternion(0, 0, 0, 0)
+            );
+            go.enemyName = name;
+            entityPool[name] = go.gameObject;
+            mutexPool.Add(name, 0);
+            lastPacket.Add(name, Time.time);
+            lastPos.Add(name, new Vector3(x, y, 0));
+            lastVelo.Add(name, new Vector3(0, 0, 0));
+        }
     }
 
     IEnumerator HandleCreateEvent(string[] tokens) 
@@ -83,11 +103,12 @@ public class SyncManager : MonoBehaviour
             if (tokens[1] == "h")
             {
                 if (!name.Equals(localPlayerName))
-                    CreateEntity(name, float.Parse(tokens[3]), float.Parse(tokens[4]));
+                    CreateEntity(true, name, float.Parse(tokens[3]), float.Parse(tokens[4]));
             }
             else
             {
                 // TODO: do something else
+                CreateEntity(false, name, float.Parse(tokens[3]), float.Parse(tokens[4]));
             }
         }
 
@@ -98,12 +119,8 @@ public class SyncManager : MonoBehaviour
         var name = tokens[1];
         if (name == localPlayerName) yield break;
         entityPool.TryGetValue(name, out GameObject obj);
-        if (obj is null)
-        {
-            // moving an object that doesnt exist???
-            CreateEntity(name, float.Parse(tokens[2]), float.Parse(tokens[3]));
-        }
-        else 
+
+        if (obj) 
         {
             print($"MOVE CMD: {name} {tokens[2]} {tokens[3]}");
 

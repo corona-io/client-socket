@@ -22,7 +22,8 @@ public class EnemySpawner : MonoBehaviour
             timer = 0;
             var pos = transform.position;
             pos += new Vector3(Random.Range(-spawnRadius, spawnRadius), Random.Range(-spawnRadius, spawnRadius), -pos.z);
-            Instantiate(spawnObjects[Random.Range(0, spawnObjects.Length)], pos, Quaternion.identity);
+            Enemy enem = Instantiate(spawnObjects[Random.Range(0, spawnObjects.Length)], pos, Quaternion.identity).GetComponent<Enemy>();
+            enem.isMine = true;
         }
     }
 }
