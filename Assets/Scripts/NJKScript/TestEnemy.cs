@@ -7,14 +7,13 @@ public class TestEnemy : Enemy
     private State<TestEnemy> enemState;
     private float speed;
     private float moveAngle;
-    private bool alive;
     
     // Start is called before the first frame update
     void Awake()
     {
         enemState = new CreationState();
-        healthPoint = 1;
-        speed = 4;
+        healthPoint = 20;
+        speed = 2;
         moveAngle = Random.Range(0f, Mathf.PI * 2);
     }
 
@@ -39,8 +38,8 @@ public class TestEnemy : Enemy
         {
             if (timer <= 0f)
             {
-                entity.invTime = 0f;
                 entity.GetComponent<SpriteRenderer>().color = Color.white;
+                ExitState(entity);
                 return new IdleState();
             }
             return this;
@@ -70,7 +69,13 @@ public class TestEnemy : Enemy
             Destroy(entity.GetComponent<Collider2D>());
             Destroy(entity.gameObject, 1.5f);
 
-            entity.alive = false; timer = 1f;
+            timer = 1f;
+        }
+
+        public override void ExitState(TestEnemy entity)
+        {
+            entity.SendDestroyPacket();
+            Destroy(entity.gameObject);
         }
 
         public override void StateBehavior(TestEnemy entity)
@@ -78,11 +83,12 @@ public class TestEnemy : Enemy
             base.StateBehavior(entity);
 
             if (timer > 0f)
-            { 
+            {
                 timer -= Time.deltaTime;
                 entity.GetComponent<SpriteRenderer>().color =
                     new Vector4(1, 1, 1, .5f + Mathf.Sin(Mathf.PI * (timer - .5f)) / 2);
             }
+            else ExitState(entity);
         }
 
         public override State<TestEnemy> UpdateState(TestEnemy entity)
@@ -96,12 +102,11 @@ public class TestEnemy : Enemy
         public override void EnterState(TestEnemy entity)
         {
             base.EnterState(entity);
-            entity.alive = true;
         }
 
         public override void ExitState(TestEnemy entity)
         {
-            
+
         }
 
         public override State<TestEnemy> UpdateState(TestEnemy entity)
@@ -116,6 +121,7 @@ public class TestEnemy : Enemy
                     if (x.gameObject.GetComponent<Player>())
                     {
                         entity.target = x.transform;
+                        ExitState(entity);
                         return new AlertedState();
                     }
                 }
@@ -124,12 +130,13 @@ public class TestEnemy : Enemy
 
         public override void StateBehavior(TestEnemy entity)
         {
+            entity.invTime -= Time.deltaTime;
             if (!entity.isMine) return;
 
             var vect = new Vector3(Mathf.Sin(entity.moveAngle), Mathf.Cos(entity.moveAngle), 0);
             entity.transform.Translate(vect.normalized * entity.speed * Time.deltaTime);
             entity.moveAngle += Random.Range(-.05f, .05f);
-            entity.invTime -= Time.deltaTime;
+            
         }
     }
 
@@ -142,17 +149,22 @@ public class TestEnemy : Enemy
 
         public override void StateBehavior(TestEnemy entity)
         {
+            entity.invTime -= Time.deltaTime;
+            if (!entity.isMine) return;
+
             var dir = (entity.target.position - entity.transform.position).normalized;
             entity.transform.Translate(dir * entity.speed * Time.deltaTime);
-            entity.invTime -= Time.deltaTime;
+            
         }
 
         public override State<TestEnemy> UpdateState(TestEnemy entity)
         {
             if (entity.healthPoint <= 0) return new DeathState();
+            if (!entity.isMine) return this;
 
+            if (entity is null) { ExitState(entity); return new IdleState(); }
             var dist = (entity.target.position - entity.transform.position).magnitude;
-            if (dist > entity.alertRadius * 1.5f) return new IdleState();
+            if (dist > entity.alertRadius * 1.5f) { ExitState(entity); return new IdleState(); }
             return this;
         }
     }

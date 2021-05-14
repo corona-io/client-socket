@@ -114,4 +114,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 0}
   enemyName: lmfao
+  isMine: 0
   alertRadius: 5
