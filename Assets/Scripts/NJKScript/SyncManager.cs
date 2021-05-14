@@ -19,12 +19,19 @@ public class SyncManager : MonoBehaviour
     string? message;
     public string localPlayerName;
     public Player playerPrefab;
-    
+    public Enemy enemyPrefab;
+
+    Dictionary<string, bool> isLocalEntity;
     Dictionary<string, GameObject> entityPool;
     Dictionary<string, int> mutexPool;
     Dictionary<string, float> lastPacket;
     Dictionary<string, Vector3> lastPos;
     Dictionary<string, Vector3> lastVelo;
+
+    public void SetLocal(string entityName) 
+    {
+        isLocalEntity.Add(entityName, true);
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -34,6 +41,7 @@ public class SyncManager : MonoBehaviour
         lastPacket = new Dictionary<string, float>();
         lastPos = new Dictionary<string, Vector3>();
         lastVelo = new Dictionary<string, Vector3>();
+        isLocalEntity = new Dictionary<string, bool>();
     }
 
     // Update is called once per frame
@@ -57,37 +65,58 @@ public class SyncManager : MonoBehaviour
         }
     }
 
-    void CreateEntity(string name, float x, float y) {
+    void CreateEntity(bool isPlayer, string name, float x, float y) {
         if (entityPool.ContainsKey(name)) return;
         entityPool.Add(name, null);
-        var go = Instantiate(
+
+        if (isPlayer)
+        {
+            var go = Instantiate(
                     playerPrefab,
                     new Vector3(x, y, 0),
                     new Quaternion(0, 0, 0, 0)
                 );
-        go.nickname = name;
-        entityPool[name] = go.gameObject;
-        mutexPool.Add(name, 0);
-        lastPacket.Add(name, Time.time);
-        lastPos.Add(name, new Vector3(x, y, 0));
-        lastVelo.Add(name, new Vector3(0, 0, 0));
+            go.nickname = name;
+            entityPool[name] = go.gameObject;
+            mutexPool.Add(name, 0);
+            lastPacket.Add(name, Time.time);
+            lastPos.Add(name, new Vector3(x, y, 0));
+            lastVelo.Add(name, new Vector3(0, 0, 0));
+        }
+
+        else 
+        {
+            var go = Instantiate(
+                    enemyPrefab,
+                    new Vector3(x, y, 0),
+                    new Quaternion(0, 0, 0, 0)
+            );
+            go.enemyName = name;
+            entityPool[name] = go.gameObject;
+            mutexPool.Add(name, 0);
+            lastPacket.Add(name, Time.time);
+            lastPos.Add(name, new Vector3(x, y, 0));
+            lastVelo.Add(name, new Vector3(0, 0, 0));
+        }
     }
 
     IEnumerator HandleCreateEvent(string[] tokens) 
     {
+        print($"CREATE CMD: {tokens}");
         var name = tokens[2];
-        if (name == localPlayerName) yield break;
+        isLocalEntity.ContainsKey(name);
+        if (isLocalEntity.ContainsKey(name)) yield break;
         entityPool.TryGetValue(tokens[1], out GameObject obj);
         if (obj is null)
         {
             if (tokens[1] == "h")
             {
                 if (!name.Equals(localPlayerName))
-                    CreateEntity(name, float.Parse(tokens[3]), float.Parse(tokens[4]));
+                    CreateEntity(true, name, float.Parse(tokens[3]), float.Parse(tokens[4]));
             }
             else
             {
-                // TODO: do something else
+                CreateEntity(false, name, float.Parse(tokens[3]), float.Parse(tokens[4]));
             }
         }
 
@@ -96,14 +125,11 @@ public class SyncManager : MonoBehaviour
     IEnumerator HandleMoveEvent(string[] tokens)
     {
         var name = tokens[1];
-        if (name == localPlayerName) yield break;
+        isLocalEntity.ContainsKey(name);
+        if (isLocalEntity.ContainsKey(name)) yield break;
         entityPool.TryGetValue(name, out GameObject obj);
-        if (obj is null)
-        {
-            // moving an object that doesnt exist???
-            CreateEntity(name, float.Parse(tokens[2]), float.Parse(tokens[3]));
-        }
-        else 
+
+        if (obj)
         {
             print($"MOVE CMD: {name} {tokens[2]} {tokens[3]}");
 
@@ -112,11 +138,11 @@ public class SyncManager : MonoBehaviour
 
             newPos = new Vector3(float.Parse(tokens[2]), float.Parse(tokens[3]), 0);
             velocity = (newPos - lastPos[name]) / (Time.time - lastPacket[name]);
-            
+
             // Sanitizing Inputs
             if (velocity.sqrMagnitude > 10000f) velocity = lastVelo[name];
-            
-            lastMoveTime = lastPacket[name] = Time.time;        
+
+            lastMoveTime = lastPacket[name] = Time.time;
             lastPos[name] = newPos;
 
             mutexPool[name]++;
@@ -126,9 +152,9 @@ public class SyncManager : MonoBehaviour
 
             while (mutexPool[name] < 2)
             {
-                obj.transform.position += 
+                obj.transform.position +=
                     velocity * (Time.time - lastMoveTime)
-                +   0.5f * (velocity - lastVelo[name]) * (Time.time - lastMoveTime) * (Time.time - lastMoveTime);
+                + 0.5f * (velocity - lastVelo[name]) * (Time.time - lastMoveTime) * (Time.time - lastMoveTime);
 
                 lastMoveTime = Time.time;
                 yield return new WaitForEndOfFrame();
@@ -136,7 +162,11 @@ public class SyncManager : MonoBehaviour
             obj.transform.position = newPos;
             lastVelo[name] = velocity;
             mutexPool[name]--;
-            
+
+        }
+        else 
+        { 
+            // work out how i should distinguish an enemy from a player
         }
 
         yield break;

@@ -46,3 +46,5 @@ MonoBehaviour:
   localPlayerName: 
   playerPrefab: {fileID: 6798439991964679045, guid: b13d6028a323b4d40857bb36b7e729f8,
     type: 3}
+  enemyPrefab: {fileID: 7751490772471354979, guid: fd7f99aeb1f2c9d4cb903131a9a3094a,
+    type: 3}

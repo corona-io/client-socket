@@ -17,12 +17,18 @@ public class EnemySpawner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        SyncManager inst = FindObjectOfType<SyncManager>();
+        if (!inst) return;
+
         timer += Time.deltaTime;
         if (timer > spawnPeriod) {
             timer = 0;
             var pos = transform.position;
             pos += new Vector3(Random.Range(-spawnRadius, spawnRadius), Random.Range(-spawnRadius, spawnRadius), -pos.z);
-            Instantiate(spawnObjects[Random.Range(0, spawnObjects.Length)], pos, Quaternion.identity);
+            Enemy enem = Instantiate(spawnObjects[Random.Range(0, spawnObjects.Length)], pos, Quaternion.identity).GetComponent<Enemy>();
+            enem.enemyName += Time.realtimeSinceStartup.ToString();
+            enem.isMine = true;
+            inst.SetLocal(enem.enemyName);
         }
     }
 }

@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/NJKScene.unity
+    guid: 386e879e938ab1b4c94db7d9b1646971
   m_configObjects: {}
