@@ -35,6 +35,12 @@ public class Bullet : MonoBehaviour
             Debug.Log($"trigger disable: {other.name}");
             gameObject.SetActive(false);
         }
+
+        if (!other.CompareTag("Player") && !other.isTrigger)
+        {
+            Debug.Log($"trigger disable: {other.name}");
+            gameObject.SetActive(false);
+        }
     }
 
     private bool CanPassLayer(int origin, int otherLayer, string tag)
