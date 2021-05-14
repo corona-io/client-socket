@@ -9,7 +9,9 @@ public class Bullet : MonoBehaviour
     private const int EnemyLayer = 3;
     private const int PlayerLayer = 6;
     private const float Speed = 10f;
-    
+
+    public string shooterName;
+
     public Vector3 Direction { get; set; }
 
     void Update()
@@ -25,10 +27,12 @@ public class Bullet : MonoBehaviour
             var enemy = other.GetComponent<Enemy>();
             enemy.Hurt(10);
         }
+        
+        Debug.Log($"trigger : {other.name}, trigger? : {other.isTrigger}");
 
-        if (!CanPassLayer(gameObject.layer, other.gameObject.layer, other.tag))
+        if (!CanPassLayer(gameObject.layer, other.gameObject.layer, other.tag) && !other.isTrigger)
         {
-            Debug.Log($"{other.name}");
+            Debug.Log($"trigger disable: {other.name}");
             gameObject.SetActive(false);
         }
     }
