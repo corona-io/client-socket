@@ -65,9 +65,11 @@ public class SyncManager : MonoBehaviour
         }
     }
 
-    void CreateEntity(bool isPlayer, string name, float x, float y) {
-        if (entityPool.ContainsKey(name)) return;
+    public GameObject CreateEntity(bool isMine, bool isPlayer, string name, float x, float y) {
+        if (entityPool.ContainsKey(name)) return null;
         entityPool.Add(name, null);
+
+        if (isMine) isLocalEntity.Add(name, true);
 
         if (isPlayer)
         {
@@ -77,11 +79,14 @@ public class SyncManager : MonoBehaviour
                     new Quaternion(0, 0, 0, 0)
                 );
             go.nickname = name;
+            go.isMine = isMine;
             entityPool[name] = go.gameObject;
             mutexPool.Add(name, 0);
             lastPacket.Add(name, Time.time);
             lastPos.Add(name, new Vector3(x, y, 0));
             lastVelo.Add(name, new Vector3(0, 0, 0));
+
+            return go.gameObject;
         }
 
         else 
@@ -92,17 +97,19 @@ public class SyncManager : MonoBehaviour
                     new Quaternion(0, 0, 0, 0)
             );
             go.enemyName = name;
+            go.isMine = isMine;
             entityPool[name] = go.gameObject;
             mutexPool.Add(name, 0);
             lastPacket.Add(name, Time.time);
             lastPos.Add(name, new Vector3(x, y, 0));
             lastVelo.Add(name, new Vector3(0, 0, 0));
+
+            return go.gameObject;
         }
     }
 
     IEnumerator HandleCreateEvent(string[] tokens) 
     {
-        print($"CREATE CMD: {tokens}");
         var name = tokens[2];
         isLocalEntity.ContainsKey(name);
         if (isLocalEntity.ContainsKey(name)) yield break;
@@ -112,11 +119,11 @@ public class SyncManager : MonoBehaviour
             if (tokens[1] == "h")
             {
                 if (!name.Equals(localPlayerName))
-                    CreateEntity(true, name, float.Parse(tokens[3]), float.Parse(tokens[4]));
+                    CreateEntity(false, true, name, float.Parse(tokens[3]), float.Parse(tokens[4]));
             }
             else
             {
-                CreateEntity(false, name, float.Parse(tokens[3]), float.Parse(tokens[4]));
+                CreateEntity(false, false, name, float.Parse(tokens[3]), float.Parse(tokens[4]));
             }
         }
 
@@ -131,7 +138,6 @@ public class SyncManager : MonoBehaviour
 
         if (obj)
         {
-            print($"MOVE CMD: {name} {tokens[2]} {tokens[3]}");
 
             Vector3 newPos, velocity;
             float lastMoveTime;
@@ -176,7 +182,6 @@ public class SyncManager : MonoBehaviour
     IEnumerator HandleDeathEvent(string[] tokens) 
     {
         var name = tokens[1];
-
         entityPool.TryGetValue(name, out GameObject obj);
         if (!(obj is null))
         {
@@ -186,6 +191,9 @@ public class SyncManager : MonoBehaviour
             lastPacket.Remove(name);
             lastPos.Remove(name);
             lastVelo.Remove(name);
+
+            isLocalEntity.TryGetValue(name, out bool result);
+            if (result) isLocalEntity.Remove(name);
         }
         yield break; 
     }

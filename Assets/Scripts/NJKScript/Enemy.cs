@@ -23,10 +23,10 @@ public abstract class Enemy : MonoBehaviour
         StartCoroutine(SendPositionInfinitely());
     }
     
-    void OnDestroy()
+    public void SendDestroyPacket()
     {
         var packetString = $"{PacketNames.ohmygod:f},{enemyName}";
-        ConnectionManager.PutMessage(packetString, true, null);
+        ConnectionManager.PutMessage(packetString, false, null);
     }
 
     private IEnumerator SendCreatePacket()

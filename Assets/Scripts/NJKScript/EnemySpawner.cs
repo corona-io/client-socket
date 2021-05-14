@@ -25,10 +25,8 @@ public class EnemySpawner : MonoBehaviour
             timer = 0;
             var pos = transform.position;
             pos += new Vector3(Random.Range(-spawnRadius, spawnRadius), Random.Range(-spawnRadius, spawnRadius), -pos.z);
-            Enemy enem = Instantiate(spawnObjects[Random.Range(0, spawnObjects.Length)], pos, Quaternion.identity).GetComponent<Enemy>();
-            enem.enemyName += Time.realtimeSinceStartup.ToString();
-            enem.isMine = true;
-            inst.SetLocal(enem.enemyName);
+            Enemy spawnee = inst.CreateEntity(true, false, "lmfao"+Time.realtimeSinceStartup.ToString(), pos.x, pos.y).GetComponent<Enemy>();
+
         }
     }
 }
