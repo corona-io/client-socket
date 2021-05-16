@@ -52,14 +52,18 @@ public partial class Player : MonoBehaviour
         renderer = GetComponent<SpriteRenderer>();
         StartCoroutine(SendPlayerCreatePacket());
         StartCoroutine(SendPositionInfinitely());
+        
+        nowState = new IdleState();
     }
     
     private void Update()
     {
-        if (isMine)
+        nowState.action(this);
+        var currState = nowState.UpdateState(this);
+        if (currState.GetType() != nowState.GetType())
         {
-            MoveWithInput();
-            AttackWithInput();
+            nowState = currState;
+            Debug.Log(nowState.GetType());
         }
     }
 
@@ -91,7 +95,6 @@ public partial class Player : MonoBehaviour
 
     private IEnumerator SendPositionInfinitely()
     {
-
         Debug.Log("Start sending position coroutine");
         while (isMine)
         {
@@ -102,6 +105,8 @@ public partial class Player : MonoBehaviour
 
     private void MoveWithInput()
     {
+        if (!isMine) return;
+        
         var horizon = Input.GetAxis("Horizontal");
         var vertical = Input.GetAxis("Vertical");
 
@@ -138,6 +143,8 @@ public partial class Player : MonoBehaviour
 
     private void AttackWithInput()
     {
+        if (!isMine) return;
+        
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             var target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -154,18 +161,35 @@ public partial class Player : MonoBehaviour
     {
         public override State<Player> UpdateState(Player entity)
         {
-            if (Input.GetKeyDown(KeyCode.Space))
+            var horizontal = Input.GetAxis("Horizontal");
+            var vertical = Input.GetAxis("Vertical");
+            
+            if (Input.GetKeyDown(KeyCode.Space) && (horizontal != 0 || vertical != 0))
             {
-                return new RollingState();
+                return new RollingState(horizontal, vertical);
             }
 
             return this;
+        }
+
+        public override void StateBehavior(Player entity)
+        {
+            base.StateBehavior(entity);
+            entity.MoveWithInput();
+            entity.AttackWithInput();
         }
     }
 
     public class RollingState : State<Player>
     {
         private float leftRollingTime;
+        private float horizontal, vertical;
+
+        public RollingState(float horizontal, float vertical)
+        {
+            this.horizontal = horizontal;
+            this.vertical = vertical;
+        }
 
         public override void EnterState(Player entity)
         {
