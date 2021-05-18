@@ -205,14 +205,6 @@ public class SyncManager : MonoBehaviour
         entityPool.TryGetValue(name, out GameObject shooterObj);
         if (shooterObj is null) yield break;
 
-        var bullet = ObjectPoolManager.Instance.Dequeue(ObjectPoolManager.PoolingObjects.Bullet);
-        bullet.position = new Vector3(float.Parse(tokens[2]), float.Parse(tokens[3]), 0);
-        bullet.GetComponent<Bullet>().Direction = new Vector3(float.Parse(tokens[4]), float.Parse(tokens[5]), 0);
-        bullet.gameObject.layer = shooterObj.layer;
-
-        var bulletSprite = bullet.GetComponent<SpriteRenderer>();
-        bulletSprite.sortingLayerName = shooterObj.GetComponent<SpriteRenderer>().sortingLayerName;
-        bulletSprite.sortingOrder = shooterObj.GetComponent<SpriteRenderer>().sortingOrder;
-
+        shooterObj.GetComponent<Player>().Attack(new Vector3(float.Parse(tokens[4]), float.Parse(tokens[5])));
     }
 }
