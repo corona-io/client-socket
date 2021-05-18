@@ -59,7 +59,7 @@ public class SyncManager : MonoBehaviour
                 "damage" => HandleDamageEvent(splitMessage),
                 "ohmygod" => HandleDeathEvent(splitMessage),
                 "lv999boss" => HandleLVLUpEvent(splitMessage),
-                _ => throw new NotSupportedException()
+                "shot" => HandleProjectileEvent(splitMessage)
             };
             StartCoroutine(routine);
         }
@@ -111,7 +111,6 @@ public class SyncManager : MonoBehaviour
     IEnumerator HandleCreateEvent(string[] tokens) 
     {
         var name = tokens[2];
-        isLocalEntity.ContainsKey(name);
         if (isLocalEntity.ContainsKey(name)) yield break;
         entityPool.TryGetValue(tokens[1], out GameObject obj);
         if (obj is null)
@@ -132,7 +131,6 @@ public class SyncManager : MonoBehaviour
     IEnumerator HandleMoveEvent(string[] tokens)
     {
         var name = tokens[1];
-        isLocalEntity.ContainsKey(name);
         if (isLocalEntity.ContainsKey(name)) yield break;
         entityPool.TryGetValue(name, out GameObject obj);
 
@@ -198,4 +196,23 @@ public class SyncManager : MonoBehaviour
         yield break; 
     }
     IEnumerator HandleLVLUpEvent(string[] tokens) { yield break; }
+
+    IEnumerator HandleProjectileEvent(string[] tokens)
+    {
+        var name = tokens[1];
+        if (isLocalEntity.ContainsKey(name)) yield break;
+
+        entityPool.TryGetValue(name, out GameObject shooterObj);
+        if (shooterObj is null) yield break;
+
+        var bullet = ObjectPoolManager.Instance.Dequeue(ObjectPoolManager.PoolingObjects.Bullet);
+        bullet.position = new Vector3(float.Parse(tokens[2]), float.Parse(tokens[3]), 0);
+        bullet.GetComponent<Bullet>().Direction = new Vector3(float.Parse(tokens[4]), float.Parse(tokens[5]), 0);
+        bullet.gameObject.layer = shooterObj.layer;
+
+        var bulletSprite = bullet.GetComponent<SpriteRenderer>();
+        bulletSprite.sortingLayerName = shooterObj.GetComponent<SpriteRenderer>().sortingLayerName;
+        bulletSprite.sortingOrder = shooterObj.GetComponent<SpriteRenderer>().sortingOrder;
+
+    }
 }
