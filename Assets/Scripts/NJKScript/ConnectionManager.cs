@@ -29,6 +29,7 @@ public class ConnectionManager : MonoBehaviour
             terminated = false;
             globalSocket.SocketInit("ws://hojoondev.kro.kr:3001", true);
             globalSocket.AddOpenEvent((sender, e) => { print("Established!"); established = true; });
+            globalSocket.AddMessageEvent((sender, e) => { print(e.Data); });
             globalSocket.AddCloseEvent((sender, e) => { print("Connection Closed"); });
         }
         StartCoroutine(GlobalSocketLoop());
@@ -69,7 +70,7 @@ public class ConnectionManager : MonoBehaviour
 
         while (!terminated)
         {
-            globalSocket.DeleteRecentMessageEvent();
+            //globalSocket.DeleteRecentMessageEvent();
             globalSocket.AddMessageEvent(
                 (sender, e) =>
                 {

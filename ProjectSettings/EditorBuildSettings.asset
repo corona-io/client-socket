@@ -5,7 +5,10 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/NJKScene.unity
     guid: 386e879e938ab1b4c94db7d9b1646971
+  - enabled: 1
+    path: Assets/Cainos/Pixel Art Top Down - Basic/Scene/SampleMap.unity
+    guid: a51e5e81830ca0740b5cc532f71852b7
   m_configObjects: {}
