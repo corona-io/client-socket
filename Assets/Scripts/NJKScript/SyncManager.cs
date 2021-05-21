@@ -205,6 +205,6 @@ public class SyncManager : MonoBehaviour
         entityPool.TryGetValue(name, out GameObject shooterObj);
         if (shooterObj is null) yield break;
 
-        shooterObj.GetComponent<Player>().Attack(new Vector3(float.Parse(tokens[4]), float.Parse(tokens[5])));
+        shooterObj.GetComponent<Player>().Attack(new Vector3(float.Parse(tokens[4]), float.Parse(tokens[5]))); 
     }
 }
