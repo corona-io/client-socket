@@ -13,7 +13,6 @@ public enum PacketNames
     damage,
     ohmygod,
     lv999boss,
-    shot,
     None
 }
 
@@ -36,8 +35,6 @@ public partial class Player : MonoBehaviour
         bullet.GetComponent<Bullet>().Direction = dir;
         bullet.position = transform.position;
         bullet.gameObject.layer = gameObject.layer;
-        bullet.GetComponent<Bullet>().shooterName = nickname;
-        
         var bulletSprite = bullet.GetComponent<SpriteRenderer>();
         bulletSprite.sortingLayerName = renderer.sortingLayerName;
         bulletSprite.sortingOrder = renderer.sortingOrder;
@@ -151,15 +148,9 @@ public partial class Player : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             var target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            var position = transform.position;
-            var dir = target - position;
+            var dir = target - transform.position;
             float angle = Mathf.Atan2(dir.y, dir.x) - Mathf.PI / 2;
-            var direction = new Vector3(-Mathf.Sin(angle), Mathf.Cos(angle), 0);
-
-            var packetString = $"{PacketNames.shot:f},{nickname},{position.x},{position.y},{direction.x},{direction.y}";
-            ConnectionManager.PutMessage(packetString, true, (error) => { });
-            
-            Attack(direction);
+            Attack(new Vector3(-Mathf.Sin(angle), Mathf.Cos(angle), 0));
         }
     }
 }
