@@ -22,12 +22,20 @@ public partial class Player : MonoBehaviour
     [SerializeField] private int healthPoint;
     [SerializeField] private float speed;
     [SerializeField] public string nickname;
+
+    [HideInInspector] public bool isRolling;
     
     private Animator animator;
     private Rigidbody2D rigidbody;
     private SpriteRenderer renderer;
     private State<Player> nowState;
     private static readonly int IsMoving = Animator.StringToHash("IsMoving");
+
+    public int HealthPoint
+    {
+        get => healthPoint;
+        set => healthPoint = value;
+    }
 
     public void Attack(Vector3 dir)
     {
@@ -42,7 +50,10 @@ public partial class Player : MonoBehaviour
 
     public void Hurt()
     {
-        
+        if (!isRolling)
+        {
+            
+        }
     }
     
     private void Start()
@@ -54,6 +65,7 @@ public partial class Player : MonoBehaviour
         StartCoroutine(SendPositionInfinitely());
         
         nowState = new IdleState();
+        transform.RotateAround(transform.position, Vector3.forward, 359f);
     }
     
     private void Update()
@@ -88,7 +100,6 @@ public partial class Player : MonoBehaviour
         var pos = transform.position;
         var packetString = $"{PacketNames.create:f},h,{nickname},{pos.x},{pos.y}";
         UIManager.Instance.SetPacketMessage(packetString);
-        //text.text = packetString;
 
         ConnectionManager.PutMessage(packetString, true, (error) => { });
     }
@@ -185,6 +196,8 @@ public partial class Player : MonoBehaviour
         private float leftRollingTime;
         private float horizontal, vertical;
 
+        private const float MaxRollingTime = 0.5f;
+
         public RollingState(float horizontal, float vertical)
         {
             this.horizontal = horizontal;
@@ -194,7 +207,7 @@ public partial class Player : MonoBehaviour
         public override void EnterState(Player entity)
         {
             base.EnterState(entity);
-            leftRollingTime = 0.5f;
+            leftRollingTime = MaxRollingTime;
         }
 
         public override State<Player> UpdateState(Player entity)
@@ -210,11 +223,29 @@ public partial class Player : MonoBehaviour
         {
             base.StateBehavior(entity);
             leftRollingTime -= Time.deltaTime;
+            entity.StartCoroutine(RotateSprite(entity.transform));
         }
 
         public override void ExitState(Player entity)
         {
             base.ExitState(entity);
+        }
+
+        private IEnumerator RotateSprite(Transform transform)
+        {
+            float lastXOffset = 0, lastYOffset = 0;
+            float xOffset, yOffset;
+            while (true)
+            {
+                xOffset = Mathf.Sin(leftRollingTime / MaxRollingTime * 2 * Mathf.PI);
+                //yOffset = 
+                var rotationValue = Quaternion.Euler(0, 0, 360 * (leftRollingTime / MaxRollingTime));
+                transform.rotation = rotationValue;
+                //var pos = transform.position;
+                //pos.y += 0.4f;
+                yield return null;
+                if(leftRollingTime <= 0) yield break;
+            }
         }
     }
 }
