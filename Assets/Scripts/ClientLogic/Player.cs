@@ -150,6 +150,12 @@ public partial class Player : MonoBehaviour
         }
         
         rigidbody.velocity = new Vector2(horizon, vertical).normalized * (speed);
+        
+        if (Input.GetKeyDown(KeyCode.Space) && (horizon != 0 || vertical != 0))
+        {
+            isRolling = true;
+            
+        }
     }
 
     private void AttackWithInput()
@@ -175,7 +181,7 @@ public partial class Player : MonoBehaviour
             var horizontal = Input.GetAxis("Horizontal");
             var vertical = Input.GetAxis("Vertical");
             
-            if (Input.GetKeyDown(KeyCode.Space) && (horizontal != 0 || vertical != 0))
+            if (entity.isRolling)
             {
                 return new RollingState(horizontal, vertical);
             }
@@ -216,6 +222,8 @@ public partial class Player : MonoBehaviour
             {
                 return this;
             }
+
+            ExitState(entity);
             return new IdleState();
         }
 
@@ -229,6 +237,7 @@ public partial class Player : MonoBehaviour
         public override void ExitState(Player entity)
         {
             base.ExitState(entity);
+            entity.isRolling = false;
         }
 
         private IEnumerator RotateSprite(Transform transform)
