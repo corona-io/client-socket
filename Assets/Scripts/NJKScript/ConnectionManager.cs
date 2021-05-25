@@ -75,7 +75,11 @@ public class ConnectionManager : MonoBehaviour
                 (sender, e) =>
                 {
                     string[] splitTokens = {"brodcast: "};
-                    var message = e.Data.Split(splitTokens, StringSplitOptions.RemoveEmptyEntries)[0];
+                    string message;
+                    if (e.Data.Contains("brodcast:") == false)
+                        message = e.Data;
+                    else
+                        message = e.Data.Split(splitTokens, StringSplitOptions.RemoveEmptyEntries)[0];
                     inputMessageQueue.Enqueue(message);
                 }
             );
