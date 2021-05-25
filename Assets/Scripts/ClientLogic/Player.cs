@@ -251,16 +251,10 @@ public partial class Player : MonoBehaviour
 
         private IEnumerator RotateSprite(Transform transform)
         {
-            float lastXOffset = 0, lastYOffset = 0;
-            float xOffset, yOffset;
             while (true)
             {
-                xOffset = Mathf.Sin(leftRollingTime / MaxRollingTime * 2 * Mathf.PI);
-                //yOffset = 
                 var rotationValue = Quaternion.Euler(0, 0, 360 * (leftRollingTime / MaxRollingTime));
                 transform.rotation = rotationValue;
-                //var pos = transform.position;
-                //pos.y += 0.4f;
                 yield return null;
                 if(leftRollingTime <= 0) yield break;
             }

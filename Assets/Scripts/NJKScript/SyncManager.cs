@@ -68,12 +68,12 @@ public class SyncManager : MonoBehaviour
             switch (splitMessage[0]) 
             {
                 case "create": StartCoroutine(HandleCreateEvent(splitMessage)); break;
-                case "move": StartCoroutine(HandleCreateEvent(splitMessage)); break;
-                case "shot": StartCoroutine(HandleCreateEvent(splitMessage)); break;
-                case "attack": StartCoroutine(HandleCreateEvent(splitMessage)); break;
-                case "damage": StartCoroutine(HandleCreateEvent(splitMessage)); break;
-                case "ohmygod": StartCoroutine(HandleCreateEvent(splitMessage)); break;
-                case "lv999boss": StartCoroutine(HandleCreateEvent(splitMessage)); break;
+                case "move": StartCoroutine(HandleMoveEvent(splitMessage)); break;
+                case "shot": StartCoroutine(HandleProjectileEvent(splitMessage)); break;
+                case "attack": StartCoroutine(HandleAttackEvent(splitMessage)); break;
+                case "damage": StartCoroutine(HandleDamageEvent(splitMessage)); break;
+                case "ohmygod": StartCoroutine(HandleDeathEvent(splitMessage)); break;
+                case "lv999boss": StartCoroutine(HandleLVLUpEvent(splitMessage)); break;
                 case "undefined": /* NOP */ break;
                 
                 default:
