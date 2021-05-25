@@ -29,7 +29,18 @@ public class ConnectionManager : MonoBehaviour
             terminated = false;
             globalSocket.SocketInit("ws://hojoondev.kro.kr:3001", true);
             globalSocket.AddOpenEvent((sender, e) => { print("Established!"); established = true; });
-            globalSocket.AddMessageEvent((sender, e) => { print(e.Data); });
+            globalSocket.AddMessageEvent(
+                (sender, e) =>
+                {
+                    string[] splitTokens = { "brodcast: " };
+                    string message;
+                    if (e.Data.Contains("brodcast:") == false)
+                        message = e.Data;
+                    else
+                        message = e.Data.Split(splitTokens, StringSplitOptions.RemoveEmptyEntries)[0];
+                    inputMessageQueue.Enqueue(message);
+                }
+            );
             globalSocket.AddCloseEvent((sender, e) => { print("Connection Closed"); });
         }
         StartCoroutine(GlobalSocketLoop());
@@ -70,19 +81,6 @@ public class ConnectionManager : MonoBehaviour
 
         while (!terminated)
         {
-            //globalSocket.DeleteRecentMessageEvent();
-            globalSocket.AddMessageEvent(
-                (sender, e) =>
-                {
-                    string[] splitTokens = {"brodcast: "};
-                    string message;
-                    if (e.Data.Contains("brodcast:") == false)
-                        message = e.Data;
-                    else
-                        message = e.Data.Split(splitTokens, StringSplitOptions.RemoveEmptyEntries)[0];
-                    inputMessageQueue.Enqueue(message);
-                }
-            );
             if (outputMessageQueue.Count > 0) {
                 var item = outputMessageQueue.Dequeue();
                 globalSocket.SocketSend(item.packetString, item.asyncSend, item.callback);

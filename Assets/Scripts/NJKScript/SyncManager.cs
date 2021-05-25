@@ -75,10 +75,10 @@ public class SyncManager : MonoBehaviour
                 case "ohmygod": StartCoroutine(HandleDeathEvent(splitMessage)); break;
                 case "lv999boss": StartCoroutine(HandleLVLUpEvent(splitMessage)); break;
                 case "undefined": /* NOP */ break;
-                
+                case "roll": StartCoroutine(HandleRollEvent(splitMessage)); break;
                 default:
                     playerInitPackets.Add(splitMessage); recievedPlayerInitPackets++;
-                    if (recievedPlayerInitPackets == 3) InitializePlayers();
+                    if (recievedPlayerInitPackets == 4) InitializePlayers();
                     break;
             };
         }
@@ -199,6 +199,7 @@ public class SyncManager : MonoBehaviour
     IEnumerator HandleDeathEvent(string[] tokens) 
     {
         var name = tokens[1];
+        print($"DESTROY {name}");
         entityPool.TryGetValue(name, out GameObject obj);
         if (!(obj is null))
         {
@@ -225,5 +226,19 @@ public class SyncManager : MonoBehaviour
         if (shooterObj is null) yield break;
 
         shooterObj.GetComponent<Player>().Attack(new Vector3(float.Parse(tokens[4]), float.Parse(tokens[5]))); 
+    }
+
+    IEnumerator HandleRollEvent(string[] tokens)
+    {
+        var name = tokens[1];
+        if (isLocalEntity.ContainsKey(name)) yield break;
+
+        entityPool.TryGetValue(name, out GameObject rollerObj);
+        if (rollerObj is null) yield break;
+
+        Player plr = rollerObj.GetComponent<Player>();
+        plr.horizontal = float.Parse(tokens[2]);
+        plr.vertical = float.Parse(tokens[3]);
+        plr.isRolling = true;
     }
 }

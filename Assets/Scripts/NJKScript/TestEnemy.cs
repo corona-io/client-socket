@@ -6,6 +6,7 @@ public class TestEnemy : Enemy
 {
     private State<TestEnemy> enemState;
     private float speed;
+    private Rigidbody2D rigidbody;
     private float moveAngle;
     
     // Start is called before the first frame update
@@ -15,6 +16,7 @@ public class TestEnemy : Enemy
         healthPoint = 20;
         speed = 2;
         moveAngle = Random.Range(0f, Mathf.PI * 2);
+        rigidbody = gameObject.GetComponent<Rigidbody2D>();
     }
 
     void Update()
@@ -134,7 +136,7 @@ public class TestEnemy : Enemy
             if (!entity.isMine) return;
 
             var vect = new Vector3(Mathf.Sin(entity.moveAngle), Mathf.Cos(entity.moveAngle), 0);
-            entity.transform.Translate(vect.normalized * entity.speed * Time.deltaTime);
+            entity.rigidbody.velocity = vect.normalized * entity.speed;
             entity.moveAngle += Random.Range(-.05f, .05f);
             
         }
@@ -152,8 +154,8 @@ public class TestEnemy : Enemy
             entity.invTime -= Time.deltaTime;
             if (!entity.isMine) return;
 
-            var dir = (entity.target.position - entity.transform.position).normalized;
-            entity.transform.Translate(dir * entity.speed * Time.deltaTime);
+            var dir = (entity.target.position - entity.transform.position);
+            entity.rigidbody.velocity = dir.normalized * entity.speed;
             
         }
 

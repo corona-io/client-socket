@@ -17,6 +17,12 @@ public abstract class Enemy : MonoBehaviour
         if (invTime <= 0f) { healthPoint -= dmg; invTime = .5f; } 
     }
 
+    void OnDestroy()
+    {
+        var packetString = $"{PacketNames.create:f},{enemyName}";
+        ConnectionManager.PutMessage(packetString, false, null);
+    }
+
     void Start()
     {
         StartCoroutine(SendCreatePacket());

@@ -22,10 +22,13 @@ public class EnemySpawner : MonoBehaviour
 
         timer += Time.deltaTime;
         if (timer > spawnPeriod) {
-            timer = 0;
             var pos = transform.position;
             pos += new Vector3(Random.Range(-spawnRadius, spawnRadius), Random.Range(-spawnRadius, spawnRadius), -pos.z);
-            Enemy spawnee = inst.CreateEntity(true, false, "lmfao"+Time.realtimeSinceStartup.ToString(), pos.x, pos.y).GetComponent<Enemy>();
+            if (Physics2D.OverlapCircle(pos, .5f) is null) {
+                timer = 0;
+                Enemy spawnee = inst.CreateEntity(true, false, "lmfao"+Time.realtimeSinceStartup.ToString(), pos.x, pos.y).GetComponent<Enemy>();
+            }
+            
 
         }
     }
