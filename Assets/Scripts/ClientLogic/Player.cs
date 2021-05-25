@@ -25,6 +25,8 @@ public partial class Player : MonoBehaviour
     [SerializeField] public string nickname;
 
     [HideInInspector] public bool isRolling;
+    [HideInInspector] public float horizontal;
+    [HideInInspector] public float vertical;
     
     private Animator animator;
     private Rigidbody2D rigidbody;
@@ -157,7 +159,8 @@ public partial class Player : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) && (horizon != 0 || vertical != 0))
         {
             isRolling = true;
-            
+            horizontal = horizon;
+            this.vertical = vertical;
         }
     }
 
@@ -187,12 +190,9 @@ public partial class Player : MonoBehaviour
     {
         public override State<Player> UpdateState(Player entity)
         {
-            var horizontal = Input.GetAxis("Horizontal");
-            var vertical = Input.GetAxis("Vertical");
-            
             if (entity.isRolling)
             {
-                return new RollingState(horizontal, vertical);
+                return new RollingState(entity.horizontal, entity.vertical);
             }
 
             return this;
@@ -223,6 +223,7 @@ public partial class Player : MonoBehaviour
         {
             base.EnterState(entity);
             leftRollingTime = MaxRollingTime;
+            entity.rigidbody.velocity = new Vector2(horizontal, vertical) * entity.speed * 1.5f;
         }
 
         public override State<Player> UpdateState(Player entity)
@@ -247,6 +248,7 @@ public partial class Player : MonoBehaviour
         {
             base.ExitState(entity);
             entity.isRolling = false;
+            entity.rigidbody.velocity = Vector2.zero;
         }
 
         private IEnumerator RotateSprite(Transform transform)
