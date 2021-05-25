@@ -14,6 +14,7 @@ public enum PacketNames
     ohmygod,
     lv999boss,
     shot,
+    roll,
     None
 }
 
@@ -192,6 +193,12 @@ public partial class Player : MonoBehaviour
         {
             if (entity.isRolling)
             {
+                if (entity.isMine)
+                {
+                    var packetString = $"{PacketNames.roll:f},{entity.nickname},{entity.horizontal},{entity.vertical}";
+                    ConnectionManager.PutMessage(packetString, true, (error) => { });
+                }
+                
                 return new RollingState(entity.horizontal, entity.vertical);
             }
 
