@@ -55,7 +55,7 @@ public class SyncManager : MonoBehaviour
         for (int i = 0; i < names.Length; i++)
         {
             Player plrObj = CreateEntity(false, true, names[i], xPos[i], yPos[i]).GetComponent<Player>();
-            //plrObj.healthPoint = hp;
+            plrObj.HealthPoint = (int)hp[i];
         }
     }
     // Update is called once per frame
