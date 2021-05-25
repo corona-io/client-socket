@@ -1,9 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
 
 class InvalidTokenException : Exception
 {
@@ -16,6 +15,8 @@ class InvalidTokenException : Exception
 
 public class SyncManager : MonoBehaviour
 {
+    int recievedPlayerInitPackets = 0;
+    List<string[]> playerInitPackets;
     string? message;
     public string localPlayerName;
     public Player playerPrefab;
@@ -36,6 +37,7 @@ public class SyncManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        playerInitPackets = new List<string[]>();
         entityPool = new Dictionary<string, GameObject>();
         mutexPool = new Dictionary<string, int>();
         lastPacket = new Dictionary<string, float>();
@@ -44,6 +46,18 @@ public class SyncManager : MonoBehaviour
         isLocalEntity = new Dictionary<string, bool>();
     }
 
+    void InitializePlayers() 
+    {
+        string[] names = playerInitPackets[0];
+        float[] hp = playerInitPackets[1].Select(val => float.Parse(val)).ToArray();
+        float[] xPos = playerInitPackets[2].Select(val => float.Parse(val)).ToArray();
+        float[] yPos = playerInitPackets[3].Select(val => float.Parse(val)).ToArray();
+        for (int i = 0; i < names.Length; i++)
+        {
+            Player plrObj = CreateEntity(false, true, names[i], xPos[i], yPos[i]).GetComponent<Player>();
+            //plrObj.healthPoint = hp;
+        }
+    }
     // Update is called once per frame
     void Update()
     {
@@ -51,17 +65,22 @@ public class SyncManager : MonoBehaviour
         if (!(message is null))
         {
             string[] splitMessage = message.Split(',');
-            IEnumerator routine = splitMessage[0] switch
+            switch (splitMessage[0]) 
             {
-                "create" => HandleCreateEvent(splitMessage),
-                "move" => HandleMoveEvent(splitMessage),
-                "attack" => HandleAttackEvent(splitMessage),
-                "damage" => HandleDamageEvent(splitMessage),
-                "ohmygod" => HandleDeathEvent(splitMessage),
-                "lv999boss" => HandleLVLUpEvent(splitMessage),
-                "shot" => HandleProjectileEvent(splitMessage)
+                case "create": StartCoroutine(HandleCreateEvent(splitMessage)); break;
+                case "move": StartCoroutine(HandleCreateEvent(splitMessage)); break;
+                case "shot": StartCoroutine(HandleCreateEvent(splitMessage)); break;
+                case "attack": StartCoroutine(HandleCreateEvent(splitMessage)); break;
+                case "damage": StartCoroutine(HandleCreateEvent(splitMessage)); break;
+                case "ohmygod": StartCoroutine(HandleCreateEvent(splitMessage)); break;
+                case "lv999boss": StartCoroutine(HandleCreateEvent(splitMessage)); break;
+                case "undefined": /* NOP */ break;
+                
+                default:
+                    playerInitPackets.Add(splitMessage); recievedPlayerInitPackets++;
+                    if (recievedPlayerInitPackets == 3) InitializePlayers();
+                    break;
             };
-            StartCoroutine(routine);
         }
     }
 
