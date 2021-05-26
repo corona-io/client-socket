@@ -6,6 +6,7 @@ public abstract class Enemy : MonoBehaviour
 {
     protected int healthPoint;
     protected float invTime = 99f;
+    protected float strength;
     public Transform target;
 
     public string enemyName;

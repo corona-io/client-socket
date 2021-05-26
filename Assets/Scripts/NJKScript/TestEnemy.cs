@@ -8,13 +8,15 @@ public class TestEnemy : Enemy
     private float speed;
     private Rigidbody2D rigidbody;
     private float moveAngle;
-    
+    private float attackDelay = 0;
+
     // Start is called before the first frame update
     void Awake()
     {
         enemState = new CreationState();
         healthPoint = 20;
         speed = 2;
+        strength = 1;
         moveAngle = Random.Range(0f, Mathf.PI * 2);
         rigidbody = gameObject.GetComponent<Rigidbody2D>();
     }
@@ -24,6 +26,18 @@ public class TestEnemy : Enemy
         enemState.action(this);
         State<TestEnemy> currState = enemState.UpdateState(this);
         if (currState.GetType() != enemState.GetType()) { enemState = currState; }
+
+        attackDelay -= Time.deltaTime;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        Player plr = collision.collider.GetComponent<Player>();
+        if (plr && attackDelay <= 0f) 
+        {
+            plr.Hurt();
+            attackDelay = 1f;
+        }
     }
 
     public class CreationState : State<TestEnemy>
@@ -58,6 +72,7 @@ public class TestEnemy : Enemy
         {
             base.ExitState(entity);
             entity.invTime = 0f;
+            entity.attackDelay = 0f;
         }
     }
 

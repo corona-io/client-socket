@@ -74,8 +74,11 @@ public class SyncManager : MonoBehaviour
                 case "damage": StartCoroutine(HandleDamageEvent(splitMessage)); break;
                 case "ohmygod": StartCoroutine(HandleDeathEvent(splitMessage)); break;
                 case "lv999boss": StartCoroutine(HandleLVLUpEvent(splitMessage)); break;
-                case "undefined": /* NOP */ break;
                 case "roll": StartCoroutine(HandleRollEvent(splitMessage)); break;
+                case "undefined":
+                    playerInitPackets.Add(new string[] { }); recievedPlayerInitPackets++;
+                    if (recievedPlayerInitPackets == 4) InitializePlayers();
+                    break;
                 default:
                     playerInitPackets.Add(splitMessage); recievedPlayerInitPackets++;
                     if (recievedPlayerInitPackets == 4) InitializePlayers();
