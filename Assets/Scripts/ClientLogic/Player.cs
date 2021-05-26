@@ -251,7 +251,6 @@ public partial class Player : MonoBehaviour
         {
             base.StateBehavior(entity);
             leftRollingTime -= Time.deltaTime;
-            //entity.StartCoroutine(RotateSprite(entity.transform));
         }
 
         public override void ExitState(Player entity)
@@ -259,17 +258,6 @@ public partial class Player : MonoBehaviour
             base.ExitState(entity);
             entity.isRolling = false;
             entity.rigidbody.velocity = Vector2.zero;
-        }
-
-        private IEnumerator RotateSprite(Transform transform)
-        {
-            while (true)
-            {
-                var rotationValue = Quaternion.Euler(0, 0, 360 * (leftRollingTime / MaxRollingTime));
-                transform.rotation = rotationValue;
-                yield return null;
-                if (leftRollingTime <= 0) yield break;
-            }
         }
     }
 }
