@@ -187,6 +187,8 @@ public partial class Player : MonoBehaviour
 
 public partial class Player : MonoBehaviour
 {
+    private static readonly int StartRolling = Animator.StringToHash("StartRolling");
+
     public class IdleState : State<Player>
     {
         public override State<Player> UpdateState(Player entity)
@@ -231,6 +233,7 @@ public partial class Player : MonoBehaviour
             base.EnterState(entity);
             leftRollingTime = MaxRollingTime;
             entity.rigidbody.velocity = new Vector2(horizontal, vertical) * entity.speed * 1.5f;
+            entity.animator.SetTrigger(StartRolling);
         }
 
         public override State<Player> UpdateState(Player entity)
@@ -248,7 +251,7 @@ public partial class Player : MonoBehaviour
         {
             base.StateBehavior(entity);
             leftRollingTime -= Time.deltaTime;
-            entity.StartCoroutine(RotateSprite(entity.transform));
+            //entity.StartCoroutine(RotateSprite(entity.transform));
         }
 
         public override void ExitState(Player entity)
@@ -265,7 +268,7 @@ public partial class Player : MonoBehaviour
                 var rotationValue = Quaternion.Euler(0, 0, 360 * (leftRollingTime / MaxRollingTime));
                 transform.rotation = rotationValue;
                 yield return null;
-                if(leftRollingTime <= 0) yield break;
+                if (leftRollingTime <= 0) yield break;
             }
         }
     }
