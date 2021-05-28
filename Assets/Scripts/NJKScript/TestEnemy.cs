@@ -30,7 +30,7 @@ public class TestEnemy : Enemy
         attackDelay -= Time.deltaTime;
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
         Player plr = collision.collider.GetComponent<Player>();
         if (plr && attackDelay <= 0f) 
