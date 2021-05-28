@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using ClientLogic.Singleton;
+using MyExtensions;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -33,6 +34,8 @@ public partial class Player : MonoBehaviour
     private Rigidbody2D rigidbody;
     private SpriteRenderer renderer;
     private State<Player> nowState;
+    private bool isInvincibility;
+    
     private static readonly int IsMoving = Animator.StringToHash("IsMoving");
 
     public int HealthPoint
@@ -56,9 +59,13 @@ public partial class Player : MonoBehaviour
 
     public void Hurt()
     {
-        if (!isRolling)
+        if (!isRolling && !isInvincibility)
         {
-            
+            isInvincibility = true;
+            StartCoroutine(isInvincibility.ChangeWithDelay(false, .2f, (value) => isInvincibility = value));
+            healthPoint -= 10;
+
+            healthPoint.Log("hp : ");
         }
     }
     
@@ -71,7 +78,6 @@ public partial class Player : MonoBehaviour
         StartCoroutine(SendPositionInfinitely());
         
         nowState = new IdleState();
-        transform.RotateAround(transform.position, Vector3.forward, 359f);
     }
     
     private void Update()
