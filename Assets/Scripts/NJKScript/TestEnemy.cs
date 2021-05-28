@@ -30,9 +30,9 @@ public class TestEnemy : Enemy
         attackDelay -= Time.deltaTime;
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerStay2D(Collider2D other)
     {
-        Player plr = collision.collider.GetComponent<Player>();
+        Player plr = other.GetComponent<Player>();
         if (plr && attackDelay <= 0f) 
         {
             plr.Hurt();
