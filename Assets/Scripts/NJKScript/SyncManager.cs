@@ -49,13 +49,15 @@ public class SyncManager : MonoBehaviour
     void InitializePlayers() 
     {
         string[] names = playerInitPackets[0];
-        float[] hp = playerInitPackets[1].Select(val => float.Parse(val)).ToArray();
-        float[] xPos = playerInitPackets[2].Select(val => float.Parse(val)).ToArray();
-        float[] yPos = playerInitPackets[3].Select(val => float.Parse(val)).ToArray();
+        string[] hp = playerInitPackets[1];
+        string[] xPos = playerInitPackets[2];
+        string[] yPos = playerInitPackets[3];
         for (int i = 0; i < names.Length; i++)
         {
-            Player plrObj = CreateEntity(false, true, names[i], xPos[i], yPos[i]).GetComponent<Player>();
-            plrObj.HealthPoint = (int)hp[i];
+            if (float.TryParse(hp[i], out float curr_hp) && float.TryParse(xPos[i], out float curr_xPos) && float.TryParse(yPos[i], out float curr_yPos)) {
+                Player plrObj = CreateEntity(false, true, names[i], curr_xPos, curr_yPos).GetComponent<Player>();
+                plrObj.HealthPoint = (int)curr_hp;
+            }
         }
     }
     // Update is called once per frame
@@ -80,6 +82,7 @@ public class SyncManager : MonoBehaviour
                     if (recievedPlayerInitPackets == 4) InitializePlayers();
                     break;
                 default:
+                    print(message);
                     playerInitPackets.Add(splitMessage); recievedPlayerInitPackets++;
                     if (recievedPlayerInitPackets == 4) InitializePlayers();
                     break;

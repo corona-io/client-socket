@@ -24,6 +24,10 @@ public abstract class Enemy : MonoBehaviour
         ConnectionManager.PutMessage(packetString, false, null);
     }
 
+    void OnApplicationQuit()
+    {
+        Destroy(gameObject);
+    }
     void Start()
     {
         StartCoroutine(SendCreatePacket());
