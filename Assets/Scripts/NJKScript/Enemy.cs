@@ -20,7 +20,7 @@ public abstract class Enemy : MonoBehaviour
 
     void OnDestroy()
     {
-        var packetString = $"{PacketNames.create:f},{enemyName}";
+        var packetString = $"{PacketNames.ohmygod:f},{enemyName}";
         ConnectionManager.PutMessage(packetString, false, null);
     }
 
