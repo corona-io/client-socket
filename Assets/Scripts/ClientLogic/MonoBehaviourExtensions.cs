@@ -19,7 +19,7 @@ namespace MyExtensions
         public static void Log(this object origin, string header = "")
         {
 #if UNITY_EDITOR
-            stringBuilder.Capacity = 0;
+            stringBuilder.Length = 0;
             Debug.Log(stringBuilder.Append(header).Append(origin).ToString());
 #endif
         }
