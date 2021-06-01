@@ -33,6 +33,7 @@ public partial class Player : MonoBehaviour
     private Animator animator;
     private Rigidbody2D rigidbody;
     private SpriteRenderer renderer;
+    private UIView hpUI;
     private State<Player> nowState;
     private bool isInvincibility;
     private bool isDead;
@@ -81,6 +82,10 @@ public partial class Player : MonoBehaviour
         animator = GetComponent<Animator>();
         rigidbody = GetComponent<Rigidbody2D>();
         renderer = GetComponent<SpriteRenderer>();
+        hpUI = GetComponentInChildren<UIView>();
+        
+        hpUI.UpdateAction.AddListener(UIManager.Instance.OnChangeHealthPoint(this, hpUI.GetComponent<Image>()));
+        
         StartCoroutine(SendPlayerCreatePacket());
         StartCoroutine(SendPositionInfinitely());
         
@@ -107,7 +112,6 @@ public partial class Player : MonoBehaviour
     {
         var pos = transform.position;
         var packetString = $"{PacketNames.move:f},{nickname},{pos.x},{pos.y}";
-        UIManager.Instance.SetPacketMessage(packetString);
 
         ConnectionManager.PutMessage(packetString, true, (error) => { });
     }
@@ -118,7 +122,6 @@ public partial class Player : MonoBehaviour
 
         var pos = transform.position;
         var packetString = $"{PacketNames.create:f},h,{nickname},{pos.x},{pos.y}";
-        UIManager.Instance.SetPacketMessage(packetString);
 
         ConnectionManager.PutMessage(packetString, true, (error) => { });
     }
@@ -135,7 +138,7 @@ public partial class Player : MonoBehaviour
 
     private void MoveWithInput()
     {
-        if (!isMine) return;
+        if (!isMine || isDead) return;
         
         var horizon = Input.GetAxis("Horizontal");
         var vertical = Input.GetAxis("Vertical");
@@ -180,7 +183,7 @@ public partial class Player : MonoBehaviour
 
     private void AttackWithInput()
     {
-        if (!isMine) return;
+        if (!isMine || isDead) return;
         
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
