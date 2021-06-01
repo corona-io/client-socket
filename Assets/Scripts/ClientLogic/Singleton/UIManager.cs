@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace ClientLogic.Singleton
@@ -9,8 +10,6 @@ namespace ClientLogic.Singleton
     {
         [Header("Make Player")] public InputField nicknameInput;
 
-        [Header("In Playing")] public Text packetText;
-
         public void OnStartingInput()
         {
             nicknameInput.onEndEdit.AddListener(OnEnterNickname);
@@ -18,6 +17,8 @@ namespace ClientLogic.Singleton
 
         private void OnEnterNickname(string name)
         {
+            if (name.Contains(",")) return;
+            
             var plr = Instantiate(Resources.Load<Player>("Prefabs/player"), Vector3.zero, Quaternion.identity);
             plr.name = name;
             plr.nickname = name;
@@ -29,9 +30,13 @@ namespace ClientLogic.Singleton
             nicknameInput.gameObject.SetActive(false);
         }
 
-        public void SetPacketMessage(string msg)
+        public UnityAction OnChangeHealthPoint(Player plr, Image img)
         {
-            packetText.text = msg;
+            return () =>
+            {
+                var hp = plr.HealthPoint;
+                img.fillAmount = hp / 100f;
+            };
         }
     }
 }
