@@ -69,7 +69,7 @@ public partial class Player : MonoBehaviour
 
             healthPoint.Log("hp : ");
             
-            if (healthPoint <= 0 && !isDead)
+            if (healthPoint <= 0 && !isDead && isMine)
             {
                 isDead = true;
                 UIManager.Instance.ShowDeadEvent();
