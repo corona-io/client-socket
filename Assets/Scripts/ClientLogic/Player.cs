@@ -72,6 +72,7 @@ public partial class Player : MonoBehaviour
             if (healthPoint <= 0 && !isDead)
             {
                 isDead = true;
+                UIManager.Instance.ShowDeadEvent();
                 ConnectionManager.PutMessage($"{PacketNames.ohmygod:f},{nickname}");
             }
         }
