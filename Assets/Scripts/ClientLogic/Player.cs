@@ -35,6 +35,7 @@ public partial class Player : MonoBehaviour
     private SpriteRenderer renderer;
     private State<Player> nowState;
     private bool isInvincibility;
+    private bool isDead;
     
     private static readonly int IsMoving = Animator.StringToHash("IsMoving");
 
@@ -66,6 +67,12 @@ public partial class Player : MonoBehaviour
             healthPoint -= 10;
 
             healthPoint.Log("hp : ");
+            
+            if (healthPoint <= 0 && !isDead)
+            {
+                isDead = true;
+                ConnectionManager.PutMessage($"{PacketNames.ohmygod:f},{nickname}");
+            }
         }
     }
     
